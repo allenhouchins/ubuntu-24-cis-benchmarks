@@ -1,4 +1,4 @@
-# Ubuntu 24.04 LTS CIS Benchmarks for Fleet - COMPLETE IMPLEMENTATION
+# Ubuntu 24.04 LTS CIS Benchmarks for Fleet
 # 
 # These policies have been written against v1.0.0 of the CIS Ubuntu Linux 24.04 LTS Benchmark
 # For requirements and usage details, see the CIS Benchmarks documentation at:
@@ -3397,7 +3397,6 @@ spec:
 # ✅ Core dumps and kernel security parameters
 # 
 # DEPLOYMENT NOTES:
-# - Test thoroughly in a development environment before production deployment
 # - Some policies may require customization for your specific environment
 # - Review and adjust SSH access controls based on your organization's needs
 # - Ensure audit log storage requirements meet your retention policies
