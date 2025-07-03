@@ -29,7 +29,7 @@
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure separate partition exists for /tmp
+  name: CIS - separate partition exists for /tmp
   platforms: Linux
   platform: linux
   description: |
@@ -50,7 +50,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nodev option set on /tmp partition
+  name: CIS - nodev option set on /tmp partition
   platforms: Linux
   platform: linux
   description: |
@@ -72,7 +72,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nosuid option set on /tmp partition
+  name: CIS - nosuid option set on /tmp partition
   platforms: Linux
   platform: linux
   description: |
@@ -94,7 +94,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure noexec option set on /tmp partition
+  name: CIS - noexec option set on /tmp partition
   platforms: Linux
   platform: linux
   description: |
@@ -116,7 +116,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nodev option set on /dev/shm partition
+  name: CIS - nodev option set on /dev/shm partition
   platforms: Linux
   platform: linux
   description: |
@@ -138,7 +138,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nosuid option set on /dev/shm partition
+  name: CIS - nosuid option set on /dev/shm partition
   platforms: Linux
   platform: linux
   description: |
@@ -160,7 +160,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure noexec option set on /dev/shm partition
+  name: CIS - noexec option set on /dev/shm partition
   platforms: Linux
   platform: linux
   description: |
@@ -182,7 +182,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure separate partition exists for /home
+  name: CIS - separate partition exists for /home
   platforms: Linux
   platform: linux
   description: |
@@ -202,7 +202,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nodev option set on /home partition
+  name: CIS - nodev option set on /home partition
   platforms: Linux
   platform: linux
   description: |
@@ -224,7 +224,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nosuid option set on /home partition
+  name: CIS - nosuid option set on /home partition
   platforms: Linux
   platform: linux
   description: |
@@ -246,7 +246,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure separate partition exists for /var
+  name: CIS - separate partition exists for /var
   platforms: Linux
   platform: linux
   description: |
@@ -266,7 +266,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nodev option set on /var partition
+  name: CIS - nodev option set on /var partition
   platforms: Linux
   platform: linux
   description: |
@@ -288,7 +288,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nosuid option set on /var partition
+  name: CIS - nosuid option set on /var partition
   platforms: Linux
   platform: linux
   description: |
@@ -310,7 +310,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure separate partition exists for /var/tmp
+  name: CIS - separate partition exists for /var/tmp
   platforms: Linux
   platform: linux
   description: |
@@ -330,7 +330,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nodev option set on /var/tmp partition
+  name: CIS - nodev option set on /var/tmp partition
   platforms: Linux
   platform: linux
   description: |
@@ -352,7 +352,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nosuid option set on /var/tmp partition
+  name: CIS - nosuid option set on /var/tmp partition
   platforms: Linux
   platform: linux
   description: |
@@ -374,7 +374,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure noexec option set on /var/tmp partition
+  name: CIS - noexec option set on /var/tmp partition
   platforms: Linux
   platform: linux
   description: |
@@ -396,7 +396,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure separate partition exists for /var/log
+  name: CIS - separate partition exists for /var/log
   platforms: Linux
   platform: linux
   description: |
@@ -416,7 +416,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nodev option set on /var/log partition
+  name: CIS - nodev option set on /var/log partition
   platforms: Linux
   platform: linux
   description: |
@@ -438,7 +438,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nosuid option set on /var/log partition
+  name: CIS - nosuid option set on /var/log partition
   platforms: Linux
   platform: linux
   description: |
@@ -460,7 +460,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure noexec option set on /var/log partition
+  name: CIS - noexec option set on /var/log partition
   platforms: Linux
   platform: linux
   description: |
@@ -482,7 +482,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure separate partition exists for /var/log/audit
+  name: CIS - separate partition exists for /var/log/audit
   platforms: Linux
   platform: linux
   description: |
@@ -502,7 +502,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nodev option set on /var/log/audit partition
+  name: CIS - nodev option set on /var/log/audit partition
   platforms: Linux
   platform: linux
   description: |
@@ -524,7 +524,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure nosuid option set on /var/log/audit partition
+  name: CIS - nosuid option set on /var/log/audit partition
   platforms: Linux
   platform: linux
   description: |
@@ -546,7 +546,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure noexec option set on /var/log/audit partition
+  name: CIS - noexec option set on /var/log/audit partition
   platforms: Linux
   platform: linux
   description: |
@@ -572,7 +572,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure AppArmor is installed
+  name: CIS - AppArmor is installed
   platforms: Linux
   platform: linux
   description: |
@@ -596,7 +596,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure AppArmor is enabled in the bootloader configuration
+  name: CIS - AppArmor is enabled in the bootloader configuration
   platforms: Linux
   platform: linux
   description: |
@@ -621,7 +621,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure all AppArmor Profiles are in enforce or complain mode
+  name: CIS - all AppArmor Profiles are in enforce or complain mode
   platforms: Linux
   platform: linux
   description: |
@@ -643,7 +643,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure all AppArmor Profiles are enforcing
+  name: CIS - all AppArmor Profiles are enforcing
   platforms: Linux
   platform: linux
   description: |
@@ -668,7 +668,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure dhcp server services are not in use
+  name: CIS - dhcp server services are not in use
   platforms: Linux
   platform: linux
   description: |
@@ -693,7 +693,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure dns server services are not in use
+  name: CIS - dns server services are not in use
   platforms: Linux
   platform: linux
   description: |
@@ -718,7 +718,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure dnsmasq services are not in use
+  name: CIS - dnsmasq services are not in use
   platforms: Linux
   platform: linux
   description: |
@@ -743,7 +743,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure ftp server services are not in use
+  name: CIS - ftp server services are not in use
   platforms: Linux
   platform: linux
   description: |
@@ -768,7 +768,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure print server services are not in use
+  name: CIS - print server services are not in use
   platforms: Linux
   platform: linux
   description: |
@@ -793,7 +793,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure rpcbind services are not in use
+  name: CIS - rpcbind services are not in use
   platforms: Linux
   platform: linux
   description: |
@@ -818,7 +818,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure xinetd services are not in use
+  name: CIS - xinetd services are not in use
   platforms: Linux
   platform: linux
   description: |
@@ -843,7 +843,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure X window server services are not in use
+  name: CIS - X window server services are not in use
   platforms: Linux
   platform: linux
   description: |
@@ -868,7 +868,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure IP forwarding is disabled
+  name: CIS - IP forwarding is disabled
   platforms: Linux
   platform: linux
   description: |
@@ -894,7 +894,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure packet redirect sending is disabled
+  name: CIS - packet redirect sending is disabled
   platforms: Linux
   platform: linux
   description: |
@@ -920,7 +920,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure source routed packets are not accepted
+  name: CIS - source routed packets are not accepted
   platforms: Linux
   platform: linux
   description: |
@@ -949,7 +949,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure ICMP redirects are not accepted
+  name: CIS - ICMP redirects are not accepted
   platforms: Linux
   platform: linux
   description: |
@@ -978,7 +978,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure secure ICMP redirects are not accepted
+  name: CIS - secure ICMP redirects are not accepted
   platforms: Linux
   platform: linux
   description: |
@@ -1003,7 +1003,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure suspicious packets are logged
+  name: CIS - suspicious packets are logged
   platforms: Linux
   platform: linux
   description: |
@@ -1028,7 +1028,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure broadcast ICMP requests are ignored
+  name: CIS - broadcast ICMP requests are ignored
   platforms: Linux
   platform: linux
   description: |
@@ -1049,7 +1049,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure bogus ICMP responses are ignored
+  name: CIS - bogus ICMP responses are ignored
   platforms: Linux
   platform: linux
   description: |
@@ -1070,7 +1070,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure Reverse Path Filtering is enabled
+  name: CIS - Reverse Path Filtering is enabled
   platforms: Linux
   platform: linux
   description: |
@@ -1095,7 +1095,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure TCP SYN Cookies is enabled
+  name: CIS - TCP SYN Cookies is enabled
   platforms: Linux
   platform: linux
   description: |
@@ -1116,7 +1116,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure ufw is installed
+  name: CIS - ufw is installed
   platforms: Linux
   platform: linux
   description: |
@@ -1137,7 +1137,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure ufw service is enabled
+  name: CIS - ufw service is enabled
   platforms: Linux
   platform: linux
   description: |
@@ -1162,7 +1162,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure rsyslog is installed
+  name: CIS - rsyslog is installed
   platforms: Linux
   platform: linux
   description: |
@@ -1183,7 +1183,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure rsyslog service is enabled and active
+  name: CIS - rsyslog service is enabled and active
   platforms: Linux
   platform: linux
   description: |
@@ -1206,7 +1206,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure auditd is installed
+  name: CIS - auditd is installed
   platforms: Linux
   platform: linux
   description: |
@@ -1230,7 +1230,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure auditd service is enabled and active
+  name: CIS - auditd service is enabled and active
   platforms: Linux
   platform: linux
   description: |
@@ -1253,7 +1253,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure audit log storage size is configured
+  name: CIS - audit log storage size is configured
   platforms: Linux
   platform: linux
   description: |
@@ -1276,7 +1276,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure audit logs are not automatically deleted
+  name: CIS - audit logs are not automatically deleted
   platforms: Linux
   platform: linux
   description: |
@@ -1298,7 +1298,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure system is disabled when audit logs are full
+  name: CIS - system is disabled when audit logs are full
   platforms: Linux
   platform: linux
   description: |
@@ -1325,7 +1325,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure events that modify date and time information are collected
+  name: CIS - events that modify date and time information are collected
   platforms: Linux
   platform: linux
   description: |
@@ -1353,7 +1353,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure events that modify user/group information are collected
+  name: CIS - events that modify user/group information are collected
   platforms: Linux
   platform: linux
   description: |
@@ -1381,7 +1381,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure events that modify the system's network environment are collected
+  name: CIS - events that modify the system's network environment are collected
   platforms: Linux
   platform: linux
   description: |
@@ -1412,7 +1412,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure use of privileged commands are collected
+  name: CIS - use of privileged commands are collected
   platforms: Linux
   platform: linux
   description: |
@@ -1436,7 +1436,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure unsuccessful unauthorized file access attempts are collected
+  name: CIS - unsuccessful unauthorized file access attempts are collected
   platforms: Linux
   platform: linux
   description: |
@@ -1463,7 +1463,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure discretionary access control permission modification events are collected
+  name: CIS - discretionary access control permission modification events are collected
   platforms: Linux
   platform: linux
   description: |
@@ -1492,7 +1492,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure kernel module loading unloading and modification is collected
+  name: CIS - kernel module loading unloading and modification is collected
   platforms: Linux
   platform: linux
   description: |
@@ -1517,7 +1517,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure the audit configuration is immutable
+  name: CIS - the audit configuration is immutable
   platforms: Linux
   platform: linux
   description: |
@@ -1545,7 +1545,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH access is limited
+  name: CIS - SSH access is limited
   platforms: Linux
   platform: linux
   description: |
@@ -1575,7 +1575,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH Banner is configured
+  name: CIS - SSH Banner is configured
   platforms: Linux
   platform: linux
   description: |
@@ -1600,7 +1600,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH Ciphers are configured
+  name: CIS - SSH Ciphers are configured
   platforms: Linux
   platform: linux
   description: |
@@ -1625,7 +1625,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH ClientAliveInterval and ClientAliveCountMax are configured
+  name: CIS - SSH ClientAliveInterval and ClientAliveCountMax are configured
   platforms: Linux
   platform: linux
   description: |
@@ -1655,7 +1655,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH LoginGraceTime is configured
+  name: CIS - SSH LoginGraceTime is configured
   platforms: Linux
   platform: linux
   description: |
@@ -1680,7 +1680,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH MaxAuthTries is configured
+  name: CIS - SSH MaxAuthTries is configured
   platforms: Linux
   platform: linux
   description: |
@@ -1705,7 +1705,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH MaxSessions is configured
+  name: CIS - SSH MaxSessions is configured
   platforms: Linux
   platform: linux
   description: |
@@ -1730,7 +1730,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH PermitEmptyPasswords is disabled
+  name: CIS - SSH PermitEmptyPasswords is disabled
   platforms: Linux
   platform: linux
   description: |
@@ -1755,7 +1755,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH PermitRootLogin is disabled
+  name: CIS - SSH PermitRootLogin is disabled
   platforms: Linux
   platform: linux
   description: |
@@ -1780,7 +1780,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH PermitUserEnvironment is disabled
+  name: CIS - SSH PermitUserEnvironment is disabled
   platforms: Linux
   platform: linux
   description: |
@@ -1809,7 +1809,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/passwd are configured
+  name: CIS - permissions on /etc/passwd are configured
   platforms: Linux
   platform: linux
   description: |
@@ -1835,7 +1835,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/passwd- are configured
+  name: CIS - permissions on /etc/passwd- are configured
   platforms: Linux
   platform: linux
   description: |
@@ -1861,7 +1861,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/group are configured
+  name: CIS - permissions on /etc/group are configured
   platforms: Linux
   platform: linux
   description: |
@@ -1887,7 +1887,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/shadow are configured
+  name: CIS - permissions on /etc/shadow are configured
   platforms: Linux
   platform: linux
   description: |
@@ -1914,7 +1914,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/shadow- are configured
+  name: CIS - permissions on /etc/shadow- are configured
   platforms: Linux
   platform: linux
   description: |
@@ -1941,7 +1941,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/gshadow are configured
+  name: CIS - permissions on /etc/gshadow are configured
   platforms: Linux
   platform: linux
   description: |
@@ -1968,7 +1968,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/gshadow- are configured
+  name: CIS - permissions on /etc/gshadow- are configured
   platforms: Linux
   platform: linux
   description: |
@@ -1995,7 +1995,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/shells are configured
+  name: CIS - permissions on /etc/shells are configured
   platforms: Linux
   platform: linux
   description: |
@@ -2021,7 +2021,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/security/opasswd are configured
+  name: CIS - permissions on /etc/security/opasswd are configured
   platforms: Linux
   platform: linux
   description: |
@@ -2047,7 +2047,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SUID and SGID programs are managed
+  name: CIS - SUID and SGID programs are managed
   platforms: Linux
   platform: linux
   description: |
@@ -2074,7 +2074,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure no world writable files exist
+  name: CIS - no world writable files exist
   platforms: Linux
   platform: linux
   description: |
@@ -2100,7 +2100,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/crontab are configured
+  name: CIS - permissions on /etc/crontab are configured
   platforms: Linux
   platform: linux
   description: |
@@ -2130,7 +2130,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure accounts in /etc/passwd use shadowed passwords
+  name: CIS - accounts in /etc/passwd use shadowed passwords
   platforms: Linux
   platform: linux
   description: |
@@ -2151,7 +2151,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure password fields are not empty
+  name: CIS - password fields are not empty
   platforms: Linux
   platform: linux
   description: |
@@ -2172,7 +2172,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure all groups in /etc/passwd exist in /etc/group
+  name: CIS - all groups in /etc/passwd exist in /etc/group
   platforms: Linux
   platform: linux
   description: |
@@ -2193,7 +2193,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure shadow group is empty
+  name: CIS - shadow group is empty
   platforms: Linux
   platform: linux
   description: |
@@ -2221,7 +2221,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure no duplicate UIDs exist
+  name: CIS - no duplicate UIDs exist
   platforms: Linux
   platform: linux
   description: |
@@ -2242,7 +2242,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure system accounts are secured
+  name: CIS - system accounts are secured
   platforms: Linux
   platform: linux
   description: |
@@ -2268,7 +2268,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure password creation requirements are configured
+  name: CIS - password creation requirements are configured
   platforms: Linux
   platform: linux
   description: |
@@ -2292,7 +2292,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure password reuse is limited
+  name: CIS - password reuse is limited
   platforms: Linux
   platform: linux
   description: |
@@ -2319,7 +2319,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure inactive password lock is 30 days or less
+  name: CIS - inactive password lock is 30 days or less
   platforms: Linux
   platform: linux
   description: |
@@ -2343,7 +2343,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure default user shell timeout is configured
+  name: CIS - default user shell timeout is configured
   platforms: Linux
   platform: linux
   description: |
@@ -2369,7 +2369,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure default user umask is configured
+  name: CIS - default user umask is configured
   platforms: Linux
   platform: linux
   description: |
@@ -2391,7 +2391,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure no duplicate GIDs exist
+  name: CIS - no duplicate GIDs exist
   platforms: Linux
   platform: linux
   description: |
@@ -2412,7 +2412,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure no duplicate user names exist
+  name: CIS - no duplicate user names exist
   platforms: Linux
   platform: linux
   description: |
@@ -2433,7 +2433,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure no duplicate group names exist
+  name: CIS - no duplicate group names exist
   platforms: Linux
   platform: linux
   description: |
@@ -2454,7 +2454,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure root PATH Integrity
+  name: CIS - root PATH Integrity
   platforms: Linux
   platform: linux
   description: |
@@ -2486,7 +2486,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH KexAlgorithms are configured
+  name: CIS - SSH KexAlgorithms are configured
   platforms: Linux
   platform: linux
   description: |
@@ -2511,7 +2511,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH MAC algorithms are configured
+  name: CIS - SSH MAC algorithms are configured
   platforms: Linux
   platform: linux
   description: |
@@ -2536,7 +2536,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH HostbasedAuthentication is disabled
+  name: CIS - SSH HostbasedAuthentication is disabled
   platforms: Linux
   platform: linux
   description: |
@@ -2561,7 +2561,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH IgnoreRhosts is enabled
+  name: CIS - SSH IgnoreRhosts is enabled
   platforms: Linux
   platform: linux
   description: |
@@ -2586,7 +2586,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure SSH X11 forwarding is disabled
+  name: CIS - SSH X11 forwarding is disabled
   platforms: Linux
   platform: linux
   description: |
@@ -2615,7 +2615,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure IPv6 router advertisements are not accepted
+  name: CIS - IPv6 router advertisements are not accepted
   platforms: Linux
   platform: linux
   description: |
@@ -2640,7 +2640,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure kernel parameter for IPv6 redirects is disabled
+  name: CIS - kernel parameter for IPv6 redirects is disabled
   platforms: Linux
   platform: linux
   description: |
@@ -2665,7 +2665,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure kernel randomize_va_space is configured
+  name: CIS - kernel randomize_va_space is configured
   platforms: Linux
   platform: linux
   description: |
@@ -2686,7 +2686,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure core dumps are restricted
+  name: CIS - core dumps are restricted
   platforms: Linux
   platform: linux
   description: |
@@ -2719,7 +2719,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure successful file system mounts are collected
+  name: CIS - successful file system mounts are collected
   platforms: Linux
   platform: linux
   description: |
@@ -2744,7 +2744,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure file deletion events by users are collected
+  name: CIS - file deletion events by users are collected
   platforms: Linux
   platform: linux
   description: |
@@ -2769,7 +2769,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure changes to system administration scope (sudoers) is collected
+  name: CIS - changes to system administration scope (sudoers) is collected
   platforms: Linux
   platform: linux
   description: |
@@ -2794,7 +2794,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure system administrator actions (sudolog) are collected
+  name: CIS - system administrator actions (sudolog) are collected
   platforms: Linux
   platform: linux
   description: |
@@ -2818,7 +2818,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure events that modify the system's Mandatory Access Controls are collected
+  name: CIS - events that modify the system's Mandatory Access Controls are collected
   platforms: Linux
   platform: linux
   description: |
@@ -2843,7 +2843,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure successful and unsuccessful attempts to use the chcon command are collected
+  name: CIS - successful and unsuccessful attempts to use the chcon command are collected
   platforms: Linux
   platform: linux
   description: |
@@ -2869,7 +2869,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure successful and unsuccessful attempts to use the setfacl command are collected
+  name: CIS - successful and unsuccessful attempts to use the setfacl command are collected
   platforms: Linux
   platform: linux
   description: |
@@ -2895,7 +2895,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure successful and unsuccessful attempts to use the chacl command are collected
+  name: CIS - successful and unsuccessful attempts to use the chacl command are collected
   platforms: Linux
   platform: linux
   description: |
@@ -2921,7 +2921,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure successful and unsuccessful attempts to use the usermod command are collected
+  name: CIS - successful and unsuccessful attempts to use the usermod command are collected
   platforms: Linux
   platform: linux
   description: |
@@ -2949,7 +2949,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/cron.hourly are configured
+  name: CIS - permissions on /etc/cron.hourly are configured
   platforms: Linux
   platform: linux
   description: |
@@ -2975,7 +2975,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/cron.daily are configured
+  name: CIS - permissions on /etc/cron.daily are configured
   platforms: Linux
   platform: linux
   description: |
@@ -3001,7 +3001,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/cron.weekly are configured
+  name: CIS - permissions on /etc/cron.weekly are configured
   platforms: Linux
   platform: linux
   description: |
@@ -3027,7 +3027,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/cron.monthly are configured
+  name: CIS - permissions on /etc/cron.monthly are configured
   platforms: Linux
   platform: linux
   description: |
@@ -3053,7 +3053,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/cron.d are configured
+  name: CIS - permissions on /etc/cron.d are configured
   platforms: Linux
   platform: linux
   description: |
@@ -3079,7 +3079,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure cron is restricted to authorized users
+  name: CIS - cron is restricted to authorized users
   platforms: Linux
   platform: linux
   description: |
@@ -3112,7 +3112,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure at is restricted to authorized users
+  name: CIS - at is restricted to authorized users
   platforms: Linux
   platform: linux
   description: |
@@ -3148,7 +3148,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure bootloader password is set
+  name: CIS - bootloader password is set
   platforms: Linux
   platform: linux
   description: |
@@ -3179,7 +3179,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on bootloader config are configured
+  name: CIS - permissions on bootloader config are configured
   platforms: Linux
   platform: linux
   description: |
@@ -3205,7 +3205,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure authentication required for single user mode
+  name: CIS - authentication required for single user mode
   platforms: Linux
   platform: linux
   description: |
@@ -3227,7 +3227,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure message of the day is configured properly
+  name: CIS - message of the day is configured properly
   platforms: Linux
   platform: linux
   description: |
@@ -3250,7 +3250,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure local login warning banner is configured properly
+  name: CIS - local login warning banner is configured properly
   platforms: Linux
   platform: linux
   description: |
@@ -3274,7 +3274,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure remote login warning banner is configured properly
+  name: CIS - remote login warning banner is configured properly
   platforms: Linux
   platform: linux
   description: |
@@ -3298,7 +3298,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/motd are configured
+  name: CIS - permissions on /etc/motd are configured
   platforms: Linux
   platform: linux
   description: |
@@ -3324,7 +3324,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/issue are configured
+  name: CIS - permissions on /etc/issue are configured
   platforms: Linux
   platform: linux
   description: |
@@ -3350,7 +3350,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - Ensure permissions on /etc/issue.net are configured
+  name: CIS - permissions on /etc/issue.net are configured
   platforms: Linux
   platform: linux
   description: |
