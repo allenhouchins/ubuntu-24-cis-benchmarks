@@ -42,7 +42,7 @@ A complete, production-ready implementation of **CIS Ubuntu Linux 24.04 LTS Benc
 
 ### Fleet CLI (fleetctl)
 ```bash
-# Install fleetctl
+# Install fleetctl (update to release of your preferred platform)
 curl -L https://github.com/fleetdm/fleet/releases/latest/download/fleetctl_linux.tar.gz | tar xz
 
 # Configure Fleet connection
@@ -125,19 +125,6 @@ resolution: |
 2. **Create feature branch**: `git checkout -b feature/improvement-name`
 3. **Test thoroughly** with osquery and Fleet
 4. **Submit pull request** with detailed description
-
-### Development Setup
-```bash
-# Clone repository
-git clone https://github.com/yourusername/ubuntu-cis-benchmarks.git
-cd ubuntu-cis-benchmarks
-
-# Install development dependencies
-pip install yamllint osquery
-
-# Validate changes
-yamllint ubuntu_cis_benchmarks.yml
-```
 
 ## 📝 License
 
