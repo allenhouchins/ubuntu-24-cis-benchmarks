@@ -13,7 +13,6 @@
 # SECTION 1: INITIAL SETUP - FILESYSTEM CONFIGURATION
 # =============================================================================
 
----
 apiVersion: v1
 kind: policy
 spec:
