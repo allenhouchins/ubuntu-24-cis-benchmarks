@@ -1,11 +1,15 @@
-# Ubuntu 24.04 LTS CIS Benchmarks for Fleet
+# Ubuntu 24.04 LTS CIS Benchmarks for Fleet - CORRECTED FOR OSQUERY TABLES
 # 
 # These policies have been written against v1.0.0 of the CIS Ubuntu Linux 24.04 LTS Benchmark
 # For requirements and usage details, see the CIS Benchmarks documentation at:
 # https://www.cisecurity.org/cis-benchmarks
 #
+# IMPORTANT: This version has been corrected to use proper osquery table names:
+# - Replaced 'etc_passwd' with 'users' table
+# - All other tables (kernel_info, apparmor_profiles, shell_history, shadow) are valid osquery tables
+#
 # USAGE:
-# 1. Upload this YAML file to Fleet using fleetctl or copy paste inidividual polices through the UI
+# 1. Upload this YAML file to Fleet using fleetctl or copy paste individual policies through the UI
 # 2. Apply these policies to all hosts running Ubuntu
 # 3. Review policy results in the Fleet dashboard
 # 4. Use the resolution steps to remediate failing policies
@@ -2140,7 +2144,7 @@ spec:
     # pwconv
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT * FROM etc_passwd 
+      SELECT * FROM users 
       WHERE password != 'x' AND password != '*'
     );
   purpose: Informational
@@ -2181,8 +2185,8 @@ spec:
     Analyze the output of the audit and perform the appropriate action to correct any discrepancies found.
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT ep.gid FROM etc_passwd ep
-      LEFT JOIN groups g ON ep.gid = g.gid
+      SELECT u.gid FROM users u
+      LEFT JOIN groups g ON u.gid = g.gid
       WHERE g.gid IS NULL
     );
   purpose: Informational
@@ -2209,8 +2213,8 @@ spec:
       JOIN groups g ON ug.gid = g.gid
       WHERE g.groupname = 'shadow'
     ) OR EXISTS (
-      SELECT * FROM etc_passwd ep
-      JOIN groups g ON ep.gid = g.gid
+      SELECT * FROM users u
+      JOIN groups g ON u.gid = g.gid
       WHERE g.groupname = 'shadow'
     );
   purpose: Informational
@@ -2230,7 +2234,7 @@ spec:
     Based on the audit results, establish unique UIDs and review all files owned by the shared UIDs to determine which UID they are supposed to belong to.
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT uid FROM etc_passwd 
+      SELECT uid FROM users 
       GROUP BY uid 
       HAVING COUNT(*) > 1
     );
@@ -2254,7 +2258,7 @@ spec:
     # usermod -L <user>
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT * FROM etc_passwd 
+      SELECT * FROM users 
       WHERE uid < 1000 
       AND username != 'root' 
       AND shell NOT IN ('/usr/sbin/nologin', '/bin/false', '/sbin/nologin')
@@ -2421,7 +2425,7 @@ spec:
     Based on the audit results, establish unique user names for the users. File ownerships will automatically reflect the change as long as the users have unique UIDs.
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT username FROM etc_passwd 
+      SELECT username FROM users 
       GROUP BY username 
       HAVING COUNT(*) > 1
     );
