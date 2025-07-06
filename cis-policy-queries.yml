@@ -1773,36 +1773,53 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - ufw loopback traffic is configured
+  name: CIS - nftables loopback traffic is configured
   platforms: Linux
   platform: linux
   description: |
     Configure the loopback interface to accept traffic. Configure all other interfaces to deny traffic to the loopback network.
   resolution: |
-    Run the following commands:
-    # ufw allow in on lo
-    # ufw allow out on lo
-    # ufw deny in from 127.0.0.0/8
-    # ufw deny in from ::1
+    Run the following commands to create the table and chains if they don't exist:
+    # nft create table inet filter
+    # nft create chain inet filter input { type filter hook input priority 0 \; }
+    # nft create chain inet filter output { type filter hook output priority 0 \; }
+    
+    Then add the loopback rules:
+    # nft add rule inet filter input iif lo accept
+    # nft add rule inet filter output oif lo accept
+    # nft add rule inet filter input ip saddr 127.0.0.0/8 counter drop
+    # nft add rule inet filter input ip6 saddr ::1 counter drop
+    
+    To make rules persistent, save them:
+    # nft list ruleset > /etc/nftables.conf
+    # systemctl enable nftables
   query: |
     SELECT 1 WHERE EXISTS (
-      -- Check for INPUT rules allowing loopback interface
-      SELECT 1 FROM iptables 
-      WHERE chain = 'INPUT' 
-      AND iniface = 'lo' 
-      AND target = 'ACCEPT'
-    ) AND EXISTS (
-      -- Check for OUTPUT rules allowing loopback interface  
-      SELECT 1 FROM iptables 
-      WHERE chain = 'OUTPUT' 
-      AND outiface = 'lo' 
-      AND target = 'ACCEPT'
-    ) AND EXISTS (
-      -- Check for rules denying traffic from 127.0.0.0/8
-      SELECT 1 FROM iptables 
-      WHERE chain = 'INPUT' 
-      AND src_ip LIKE '127.%' 
-      AND target IN ('DROP', 'REJECT')
+      -- Check nftables config file for loopback rules
+      SELECT 1 FROM file 
+      WHERE path = '/etc/nftables.conf' 
+      AND (
+        contents LIKE '%iif "lo" accept%' 
+        OR contents LIKE '%iif lo accept%'
+      )
+      AND (
+        contents LIKE '%oif "lo" accept%' 
+        OR contents LIKE '%oif lo accept%'
+      )
+      AND (
+        contents LIKE '%ip saddr 127.0.0.0/8%drop%' 
+        OR contents LIKE '%ip saddr 127.0.0.0/8%reject%'
+      )
+    ) OR EXISTS (
+      -- Alternative: check if rules exist in nftables runtime
+      SELECT 1 FROM nftables 
+      WHERE value = 'lo' 
+      AND fullkey LIKE '%/rule/%'
+      AND EXISTS (
+        SELECT 1 FROM nftables n2 
+        WHERE n2.value = '127.0.0.0' 
+        AND n2.fullkey LIKE '%/rule/%/prefix/addr'
+      )
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-3.2.1.4
