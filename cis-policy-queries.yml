@@ -1786,10 +1786,23 @@ spec:
     # ufw deny in from ::1
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT * FROM iptables 
+      -- Check for INPUT rules allowing loopback interface
+      SELECT 1 FROM iptables 
       WHERE chain = 'INPUT' 
-      AND source = '127.0.0.0/8' 
-      AND target = 'DROP'
+      AND iniface = 'lo' 
+      AND target = 'ACCEPT'
+    ) AND EXISTS (
+      -- Check for OUTPUT rules allowing loopback interface  
+      SELECT 1 FROM iptables 
+      WHERE chain = 'OUTPUT' 
+      AND outiface = 'lo' 
+      AND target = 'ACCEPT'
+    ) AND EXISTS (
+      -- Check for rules denying traffic from 127.0.0.0/8
+      SELECT 1 FROM iptables 
+      WHERE chain = 'INPUT' 
+      AND src_ip LIKE '127.%' 
+      AND target IN ('DROP', 'REJECT')
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-3.2.1.4
