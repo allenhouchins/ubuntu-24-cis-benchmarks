@@ -1762,9 +1762,10 @@ spec:
     # ufw enable
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT * FROM iptables 
-      WHERE chain = 'INPUT' 
-      AND policy = 'DROP'
+      SELECT * FROM systemd_units 
+      WHERE id = 'ufw.service' 
+      AND active_state = 'active'
+      AND unit_file_state = 'enabled'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-3.2.1.3
