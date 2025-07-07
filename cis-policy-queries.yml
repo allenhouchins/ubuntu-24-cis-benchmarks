@@ -933,7 +933,7 @@ spec:
       SELECT * FROM deb_packages WHERE name = 'gdm3' AND status = 'install ok installed'
     );
   purpose: Informational
-  tags: compliance, CIS, CIS_Level1_Server, CIS-ubuntu-24.04-1.7.1
+  tags: compliance, CIS, CIS_Level1_Server, CIS-ubuntu-24.04-1.7.1, server_only
   contributors: allenhouchins
 
 # =============================================================================
@@ -1029,7 +1029,7 @@ spec:
       SELECT * FROM deb_packages WHERE name LIKE 'xserver-xorg%' AND status = 'install ok installed'
     );
   purpose: Informational
-  tags: compliance, CIS, CIS_Level1_Server, CIS-ubuntu-24.04-2.2.1
+  tags: compliance, CIS, CIS_Level1_Server, CIS-ubuntu-24.04-2.2.1, server_only
   contributors: allenhouchins
 
 ---
