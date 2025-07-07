@@ -2078,7 +2078,7 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM kernel_info 
-      WHERE name = 'audit' AND value = '1'
+      WHERE arguments LIKE '%audit=1%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.1.1.3
