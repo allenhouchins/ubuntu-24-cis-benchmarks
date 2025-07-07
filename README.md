@@ -42,8 +42,8 @@ A complete, production-ready implementation of **CIS Ubuntu Linux 24.04 LTS Benc
 
 ### Fleet CLI (fleetctl)
 ```bash
-# Install fleetctl (this is an example command, update the URL to your specific use case)
-curl -L https://github.com/fleetdm/fleet/releases/latest/download/fleetctl_linux.tar.gz | tar xz
+# Install fleetctl
+https://fleetdm.com/guides/fleetctl#installing-fleetctl
 
 # Configure Fleet connection
 fleetctl config set --address https://your-fleet-instance.com
