@@ -1795,32 +1795,25 @@ spec:
     # nft list ruleset > /etc/nftables.conf
     # systemctl enable nftables
   query: |
+    WITH loopback_accept AS (
+      -- Find rules that accept loopback traffic
+      SELECT DISTINCT 
+        SUBSTR(fullkey, 1, INSTR(fullkey || '/expr', '/expr') - 1) as rule_base
+      FROM nftables 
+      WHERE value IN ('lo', '"lo"')
+    ),
+    loopback_drop AS (
+      -- Find rules that drop 127.0.0.0/8 traffic
+      SELECT DISTINCT 
+        SUBSTR(fullkey, 1, INSTR(fullkey || '/expr', '/expr') - 1) as rule_base
+      FROM nftables 
+      WHERE (value = '127.0.0.0' AND fullkey LIKE '%/prefix/addr')
+         OR (value = '8' AND fullkey LIKE '%/prefix/len')
+    )
     SELECT 1 WHERE EXISTS (
-      -- Check nftables config file for loopback rules
-      SELECT 1 FROM file 
-      WHERE path = '/etc/nftables.conf' 
-      AND (
-        contents LIKE '%iif "lo" accept%' 
-        OR contents LIKE '%iif lo accept%'
-      )
-      AND (
-        contents LIKE '%oif "lo" accept%' 
-        OR contents LIKE '%oif lo accept%'
-      )
-      AND (
-        contents LIKE '%ip saddr 127.0.0.0/8%drop%' 
-        OR contents LIKE '%ip saddr 127.0.0.0/8%reject%'
-      )
-    ) OR EXISTS (
-      -- Alternative: check if rules exist in nftables runtime
-      SELECT 1 FROM nftables 
-      WHERE value = 'lo' 
-      AND fullkey LIKE '%/rule/%'
-      AND EXISTS (
-        SELECT 1 FROM nftables n2 
-        WHERE n2.value = '127.0.0.0' 
-        AND n2.fullkey LIKE '%/rule/%/prefix/addr'
-      )
+      SELECT 1 FROM loopback_accept
+    ) AND EXISTS (
+      SELECT 1 FROM loopback_drop
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-3.2.1.4
