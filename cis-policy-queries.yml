@@ -634,7 +634,7 @@ spec:
     apparmor=1 security=apparmor
     Run: update-grub
   query: |
-      SELECT 1 WHERE EXISTS (
+    SELECT 1 WHERE EXISTS (
       SELECT * FROM kernel_info 
       WHERE arguments LIKE '%apparmor=1%'
       AND arguments LIKE '%security=apparmor%'
