@@ -42,14 +42,14 @@ A complete, production-ready implementation of **CIS Ubuntu Linux 24.04 LTS Benc
 
 ### Fleet CLI (fleetctl)
 ```bash
-# Install fleetctl (this is an example command, update to release of your preferred platform)
+# Install fleetctl (this is an example command, update the URL to your specific use case)
 curl -L https://github.com/fleetdm/fleet/releases/latest/download/fleetctl_linux.tar.gz | tar xz
 
 # Configure Fleet connection
 fleetctl config set --address https://your-fleet-instance.com
 
 # Upload policies
-fleetctl apply -f ubuntu_cis_benchmarks.yml
+fleetctl apply -f cis-policy-queries.yml
 ```
 
 ### Method 3: Direct osquery Testing
@@ -58,7 +58,7 @@ fleetctl apply -f ubuntu_cis_benchmarks.yml
 osqueryi "SELECT 1 WHERE EXISTS (SELECT * FROM mounts WHERE path = '/tmp');"
 
 # Test with specific policy query
-osqueryi -f ubuntu_cis_benchmarks.yml
+osqueryi -f cis-policy-queries.yml
 ```
 
 ## ✅ Validation & Testing
@@ -66,7 +66,7 @@ osqueryi -f ubuntu_cis_benchmarks.yml
 ### Pre-Deployment Testing
 ```bash
 # Validate YAML syntax
-yamllint ubuntu_cis_benchmarks.yml
+yamllint cis-policy-queries.yml
 
 # Test queries locally
 osqueryi --config_path=/etc/osquery/ --verbose
