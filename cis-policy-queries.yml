@@ -3678,9 +3678,9 @@ spec:
     # sed -ri 's/(^shadow:[^:]*:[^:]*:)([^:]+$)/\1/' /etc/group
   query: |
     SELECT 1 WHERE NOT EXISTS (
-      SELECT * FROM groups 
-      WHERE groupname = 'shadow' 
-      AND LENGTH(group_list) > 0
+      SELECT * FROM user_groups ug
+      JOIN groups g ON ug.gid = g.gid
+      WHERE g.groupname = 'shadow'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-7.2.2
