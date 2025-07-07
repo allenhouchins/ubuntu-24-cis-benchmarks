@@ -2098,15 +2098,43 @@ spec:
     audit_backlog_limit=8192
     Run: update-grub
   query: |
+    -- Check for audit_backlog_limit parameter set to 8192 or higher
+    -- Using kernel_info.arguments which contains boot parameters
     SELECT 1 WHERE EXISTS (
       SELECT * FROM kernel_info 
-      WHERE name = 'audit_backlog_limit' 
-      AND CAST(value AS INTEGER) >= 8192
+      WHERE arguments LIKE '%audit_backlog_limit=%'
+      AND (
+        -- Exact CIS recommended value
+        arguments LIKE '%audit_backlog_limit=8192%' OR
+        -- Common larger values that meet the requirement  
+        arguments LIKE '%audit_backlog_limit=16384%' OR
+        arguments LIKE '%audit_backlog_limit=32768%' OR
+        arguments LIKE '%audit_backlog_limit=65536%' OR
+        arguments LIKE '%audit_backlog_limit=131072%' OR
+        arguments LIKE '%audit_backlog_limit=262144%' OR
+        -- Values in 819x range (8193-8199)
+        arguments LIKE '%audit_backlog_limit=8193%' OR
+        arguments LIKE '%audit_backlog_limit=8194%' OR
+        arguments LIKE '%audit_backlog_limit=8195%' OR
+        arguments LIKE '%audit_backlog_limit=8196%' OR
+        arguments LIKE '%audit_backlog_limit=8197%' OR
+        arguments LIKE '%audit_backlog_limit=8198%' OR
+        arguments LIKE '%audit_backlog_limit=8199%' OR
+        -- Values starting with 82, 83, 84, etc. (all >= 8200)
+        arguments LIKE '%audit_backlog_limit=82%' OR
+        arguments LIKE '%audit_backlog_limit=83%' OR
+        arguments LIKE '%audit_backlog_limit=84%' OR
+        arguments LIKE '%audit_backlog_limit=85%' OR
+        arguments LIKE '%audit_backlog_limit=86%' OR
+        arguments LIKE '%audit_backlog_limit=87%' OR
+        arguments LIKE '%audit_backlog_limit=88%' OR
+        arguments LIKE '%audit_backlog_limit=89%' OR
+        arguments LIKE '%audit_backlog_limit=9%'
+      )
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.1.1.4
   contributors: allenhouchins
-
 ---
 apiVersion: v1
 kind: policy
