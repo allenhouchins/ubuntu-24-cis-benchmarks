@@ -997,11 +997,12 @@ spec:
     user _chrony
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT * FROM processes 
-      WHERE name = 'chronyd' 
-      AND username = '_chrony'
+      SELECT 1 FROM processes p 
+      JOIN users u ON p.uid = u.uid
+      WHERE p.name = 'chronyd' 
+      AND u.username = '_chrony'
     ) OR NOT EXISTS (
-      SELECT * FROM processes WHERE name = 'chronyd'
+      SELECT 1 FROM processes WHERE name = 'chronyd'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-2.1.2.2
