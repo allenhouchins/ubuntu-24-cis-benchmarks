@@ -54,15 +54,6 @@ fleetctl apply -f cis-policy-queries.yml
 
 ## ✅ Validation & Testing
 
-### Pre-Deployment Testing
-```bash
-# Validate YAML syntax
-yamllint cis-policy-queries.yml
-
-# Test queries locally
-osqueryi --config_path=/etc/osquery/ --verbose
-```
-
 ### Policy Verification
 Each policy returns:
 - **1** = **PASSING/COMPLIANT** (secure configuration detected)
