@@ -3604,11 +3604,19 @@ spec:
     Locate files that are owned by users or groups not listed in the system configuration files, and reset the ownership of these files to some active user on the system.
   query: |
     SELECT 1 WHERE NOT EXISTS (
-      SELECT f.* FROM file f 
+      SELECT 1 FROM file f 
       LEFT JOIN users u ON f.uid = u.uid 
       WHERE u.uid IS NULL 
-      AND f.path NOT LIKE '/proc%' 
-      AND f.path NOT LIKE '/sys%'
+        AND f.directory IN (
+          '/etc', '/bin', '/sbin', '/usr/bin', '/usr/sbin', 
+          '/usr/local/bin', '/usr/local/sbin', '/var/log', 
+          '/var/lib', '/opt', '/root'
+        )
+    ) AND NOT EXISTS (
+      SELECT 1 FROM file f 
+      LEFT JOIN users u ON f.uid = u.uid 
+      WHERE u.uid IS NULL 
+        AND f.directory LIKE '/home/%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-7.1.10
