@@ -16,7 +16,7 @@ A complete, production-ready implementation of **CIS Ubuntu Linux 24.04 LTS Benc
 
 ## 📋 What's Included
 
-### 🛡️ **135 Security Controls**
+### 🛡️ **172 Security Controls**
 - **Level 1 (Basic)**: Essential security configurations
 - **Level 2 (Advanced)**: Comprehensive security hardening
 - **All major sections**: Filesystem, services, network, logging, access control, maintenance
@@ -146,7 +146,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📈 Stats
 
-- **🎯 135 policies** covering comprehensive security controls
+- **🎯 172 policies** covering comprehensive security controls
 - **✅ 100% schema validated** against osquery 5.17.0
 - **🔧 Production tested** on Ubuntu 24.04 LTS systems
 - **📊 Fleet compatible** with proper pass/fail logic
