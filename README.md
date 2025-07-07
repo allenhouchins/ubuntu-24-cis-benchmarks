@@ -52,15 +52,6 @@ fleetctl config set --address https://your-fleet-instance.com
 fleetctl apply -f cis-policy-queries.yml
 ```
 
-### Method 3: Direct osquery Testing
-```bash
-# Test individual policies with osqueryi
-osqueryi "SELECT 1 WHERE EXISTS (SELECT * FROM mounts WHERE path = '/tmp');"
-
-# Test with specific policy query
-osqueryi -f cis-policy-queries.yml
-```
-
 ## ✅ Validation & Testing
 
 ### Pre-Deployment Testing
