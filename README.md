@@ -63,12 +63,14 @@ Each policy returns:
 
 | Section | Policies | Level | Description |
 |---------|----------|-------|-------------|
-| **1. Initial Setup** | 35 | 1 & 2 | Filesystem, packages, access control |
-| **2. Services** | 25 | 1 & 2 | Service configuration and hardening |
-| **3. Network** | 20 | 1 & 2 | Network security and routing |
-| **4. Logging** | 18 | 2 | Audit and log management |
-| **5. Access Control** | 27 | 1 & 2 | SSH, authentication, user management |
-| **6. Maintenance** | 10 | 1 & 2 | File permissions and system maintenance |
+| **1. Initial Setup** | 48 | 1 & 2 | Filesystem configuration, software updates, mandatory access control, boot settings, process hardening |
+| **2. Services** | 26 | 1 & 2 | Time sync, special purpose services, client services |
+| **3. Network** | 22 | 1 & 2 | Network parameters, firewall configuration |
+| **4. Logging & Auditing** | 28 | 1 & 2 | rsyslog, journald, auditd configurations |
+| **5. Access Control** | 28 | 1 & 2 | SSH server hardening, PAM, user environment |
+| **7. System File Permissions** | 20 | 1 & 2 | File permissions and user/group settings |
+
+**Total: 172 comprehensive security policies**
 
 ## 🛠️ Customization
 
