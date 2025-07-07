@@ -634,10 +634,10 @@ spec:
     apparmor=1 security=apparmor
     Run: update-grub
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM kernel_info WHERE name = 'apparmor' AND value = '1'
-    ) AND EXISTS (
-      SELECT * FROM kernel_info WHERE name = 'security' AND value = 'apparmor'
+      SELECT 1 WHERE EXISTS (
+      SELECT * FROM kernel_info 
+      WHERE arguments LIKE '%apparmor=1%'
+      AND arguments LIKE '%security=apparmor%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-1.3.1.2
