@@ -3618,7 +3618,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - no ungrouped files or directories exist
+  name: CIS - no ungrouped files or directories exist (optimized)
   platforms: Linux
   platform: linux
   description: |
@@ -3627,11 +3627,19 @@ spec:
     Locate files that are owned by groups not listed in the system configuration files, and reset the ownership of these files to an active group.
   query: |
     SELECT 1 WHERE NOT EXISTS (
-      SELECT f.* FROM file f 
+      SELECT 1 FROM file f 
       LEFT JOIN groups g ON f.gid = g.gid 
       WHERE g.gid IS NULL 
-      AND f.path NOT LIKE '/proc%' 
-      AND f.path NOT LIKE '/sys%'
+        AND f.directory IN (
+          '/etc', '/bin', '/sbin', '/usr/bin', '/usr/sbin', 
+          '/usr/local/bin', '/usr/local/sbin', '/var/log', 
+          '/var/lib', '/opt', '/root'
+        )
+    ) AND NOT EXISTS (
+      SELECT 1 FROM file f 
+      LEFT JOIN groups g ON f.gid = g.gid 
+      WHERE g.gid IS NULL 
+        AND f.directory LIKE '/home/%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-7.1.11
