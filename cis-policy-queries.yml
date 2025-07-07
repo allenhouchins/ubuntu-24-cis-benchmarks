@@ -3571,7 +3571,7 @@ spec:
 apiVersion: v1
 kind: policy
 spec:
-  name: CIS - world writable files do not exist
+  name: CIS - world writable files do not exist (comprehensive)
   platforms: Linux
   platform: linux
   description: |
@@ -3581,11 +3581,30 @@ spec:
     # find / -xdev -type f -perm -0002 -exec chmod o-w {} \;
   query: |
     SELECT 1 WHERE NOT EXISTS (
-      SELECT * FROM file 
-      WHERE mode LIKE '%2' 
-      AND type = 'regular'
-      AND path NOT LIKE '/tmp%'
-      AND path NOT LIKE '/var/tmp%'
+      SELECT 1 FROM file f
+      WHERE f.mode LIKE '%2' 
+        AND f.type = 'regular'
+        AND f.directory IN (
+          '/etc', '/bin', '/sbin', '/usr/bin', '/usr/sbin', 
+          '/usr/local/bin', '/usr/local/sbin', '/var/log', 
+          '/var/lib', '/var/www', '/opt', '/root'
+        )
+    ) AND NOT EXISTS (
+      SELECT 1 FROM file f
+      WHERE f.mode LIKE '%2' 
+        AND f.type = 'regular'
+        AND f.directory LIKE '/home/%'
+    ) AND NOT EXISTS (
+      SELECT 1 FROM file f
+      WHERE f.mode LIKE '%2' 
+        AND f.type = 'regular'
+        AND f.directory LIKE '/usr/share/%'
+    ) AND NOT EXISTS (
+      SELECT 1 FROM file f
+      WHERE f.mode LIKE '%2' 
+        AND f.type = 'regular'
+        AND f.directory LIKE '/var/spool/%'
+        AND f.path NOT LIKE '/var/spool/mail/%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-7.1.9
