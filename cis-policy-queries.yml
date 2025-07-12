@@ -1980,7 +1980,8 @@ spec:
   query: |
     SELECT 1 WHERE NOT EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/systemd/journald.conf/Journal/ForwardToSyslog' 
+      WHERE path = '/etc/systemd/journald.conf/Journal/ForwardToSyslog'
+      AND label = 'ForwardToSyslog'
       AND value != 'no'
     );
   purpose: Informational
@@ -2145,7 +2146,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/audit/auditd.conf/max_log_file' 
+      WHERE path = '/etc/audit/auditd.conf'
+      AND label = 'max_log_file'
       AND CAST(value AS INTEGER) >= 100
     );
   purpose: Informational
@@ -2167,7 +2169,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/audit/auditd.conf/max_log_file_action' 
+      WHERE path = '/etc/audit/auditd.conf' 
+      AND label = 'max_log_file_action'
       AND value = 'keep_logs'
     );
   purpose: Informational
@@ -2191,15 +2194,18 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/audit/auditd.conf/space_left_action' 
+      WHERE path = '/etc/audit/auditd.conf' 
+      AND label = 'space_left_action'
       AND value = 'email'
     ) AND EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/audit/auditd.conf/action_mail_acct' 
+      WHERE path = '/etc/audit/auditd.conf' 
+      AND label = 'action_mail_acct'
       AND value = 'root'
     ) AND EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/audit/auditd.conf/admin_space_left_action' 
+      WHERE path = '/etc/audit/auditd.conf' 
+      AND label = 'admin_space_left_action'
       AND value = 'halt'
     );
   purpose: Informational
@@ -2683,10 +2689,14 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path LIKE '/files/etc/ssh/sshd_config/AllowUsers' 
-      OR path LIKE '/files/etc/ssh/sshd_config/AllowGroups'
-      OR path LIKE '/files/etc/ssh/sshd_config/DenyUsers'
-      OR path LIKE '/files/etc/ssh/sshd_config/DenyGroups'
+      WHERE path LIKE '/etc/ssh/sshd_config'
+      AND label = 'AllowUsers'
+      OR path LIKE '/etc/ssh/sshd_config'
+      AND label = 'AllowGroups'
+      OR path LIKE '/etc/ssh/sshd_config'
+      AND label = 'DenyUsers'
+      OR path LIKE '/etc/ssh/sshd_config'
+      AND label = 'DenyGroups'
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
     );
@@ -2711,7 +2721,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/LogLevel' 
+      WHERE path = '/etc/ssh/sshd_config' 
+      AND label = 'LogLevel'
       AND (value = 'VERBOSE' OR value = 'INFO')
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
@@ -2735,7 +2746,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/UsePAM' 
+      WHERE path = '/etc/ssh/sshd_config' 
+      AND label = 'UsePAM'
       AND value = 'yes'
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
@@ -2759,7 +2771,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/PermitRootLogin' 
+      WHERE path = '/etc/ssh/sshd_config' 
+      AND label = 'PermitRootLogin'
       AND value = 'no'
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
@@ -2783,7 +2796,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/HostbasedAuthentication' 
+      WHERE path = '/etc/ssh/sshd_config'
+      AND label = 'HostbasedAuthentication'
       AND value = 'no'
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
@@ -2807,7 +2821,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/PermitEmptyPasswords' 
+      WHERE path = '/etc/ssh/sshd_config' 
+      AND label = 'PermitEmptyPasswords'
       AND value = 'no'
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
@@ -2831,7 +2846,8 @@ spec:
   query: |
     SELECT 1 WHERE NOT EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/PermitUserEnvironment' 
+      WHERE path = '/etc/ssh/sshd_config' 
+      AND label = 'PermitUserEnvironment'
       AND value != 'no'
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports 
@@ -2856,7 +2872,8 @@ spec:
   query: |
     SELECT 1 WHERE NOT EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/IgnoreRhosts' 
+      WHERE path = '/etc/ssh/sshd_config' 
+      AND label = 'IgnoreRhosts'
       AND value != 'yes'
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports 
@@ -2881,7 +2898,8 @@ spec:
   query: |
     SELECT 1 WHERE NOT EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/X11Forwarding' 
+      WHERE path = '/etc/ssh/sshd_config' 
+      AND label = 'X11Forwarding'
       AND value != 'no'
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports 
@@ -2906,7 +2924,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/Ciphers'
+      WHERE path = '/etc/ssh/sshd_config'
+      AND label = 'Ciphers'
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
     );
@@ -2929,7 +2948,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/KexAlgorithms'
+      WHERE path = '/etc/ssh/sshd_config'
+      AND label = 'KexAlgorithms'
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
     );
@@ -2952,7 +2972,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/MACs'
+      WHERE path = '/etc/ssh/sshd_config'
+      AND label = 'MACs'
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
     );
@@ -3001,8 +3022,9 @@ spec:
     MaxAuthTries 4
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/MaxAuthTries' 
+      SELECT * FROM augeas
+      WHERE path = '/etc/ssh/sshd_config' 
+      AND label = 'MaxAuthTries'
       AND CAST(value AS INTEGER) <= 4
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
@@ -3026,7 +3048,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/MaxStartups'
+      WHERE path = '/etc/ssh/sshd_config'
+      AND label = 'MaxStartups'
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
     );
@@ -3049,7 +3072,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/LoginGraceTime' 
+      WHERE path = '/etc/ssh/sshd_config' 
+      AND label = 'LoginGraceTime'
       AND CAST(value AS INTEGER) <= 60
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
@@ -3074,7 +3098,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/ClientAliveInterval' 
+      WHERE path = '/etc/ssh/sshd_config' 
+      AND label = 'ClientAliveInterval'
       AND CAST(value AS INTEGER) > 0 
       AND CAST(value AS INTEGER) <= 300
     ) OR NOT EXISTS (
@@ -3099,7 +3124,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/MaxSessions' 
+      WHERE path = '/etc/ssh/sshd_config' 
+      AND label = 'MaxSessions'
       AND CAST(value AS INTEGER) <= 10
     ) OR NOT EXISTS (
       SELECT * FROM listening_ports 
@@ -3223,7 +3249,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/login.defs/PASS_MIN_DAYS' 
+      WHERE path = '/etc/login.defs' 
+      AND label = 'PASS_MIN_DAYS'
       AND CAST(value AS INTEGER) >= 1
     );
   purpose: Informational
@@ -3245,7 +3272,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/login.defs/PASS_MAX_DAYS' 
+      WHERE path = '/etc/login.defs' 
+      AND label = 'PASS_MAX_DAYS'
       AND CAST(value AS INTEGER) <= 365
     );
   purpose: Informational
@@ -3267,7 +3295,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/login.defs/PASS_WARN_AGE' 
+      WHERE path = '/etc/login.defs'
+      AND label = 'PASS_WARN_AGE'
       AND CAST(value AS INTEGER) >= 7
     );
   purpose: Informational
@@ -3289,7 +3318,8 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/default/useradd/INACTIVE' 
+      WHERE path = '/etc/default/useradd' 
+      AND label = 'INACTIVE'
       AND CAST(value AS INTEGER) <= 30
     );
   purpose: Informational
