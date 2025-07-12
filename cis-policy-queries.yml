@@ -2975,10 +2975,13 @@ spec:
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM augeas 
-      WHERE path = '/files/etc/ssh/sshd_config/Banner' 
+      WHERE path = '/etc/ssh/sshd_config' 
+      AND label = 'Banner' 
       AND value = '/etc/issue.net'
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT * FROM listening_ports 
+      WHERE port = 22 
+      AND protocol = 6
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.16
