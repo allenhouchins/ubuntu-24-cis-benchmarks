@@ -633,6 +633,7 @@ spec:
     Edit /etc/default/grub and add the following parameters to GRUB_CMDLINE_LINUX:
     apparmor=1 security=apparmor
     Run: update-grub
+    Reboot
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM kernel_info 
@@ -703,6 +704,7 @@ spec:
     set superusers="<username>"
     password_pbkdf2 <username> <encrypted-password>
     Run: update-grub
+    Reboot
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM file 
@@ -2071,6 +2073,7 @@ spec:
     Edit /etc/default/grub and add the following parameter to GRUB_CMDLINE_LINUX:
     audit=1
     Run: update-grub
+    Reboot
   query: |
     SELECT 1 WHERE EXISTS (
       SELECT * FROM kernel_info 
@@ -2093,44 +2096,33 @@ spec:
     Edit /etc/default/grub and add the following parameter to GRUB_CMDLINE_LINUX:
     audit_backlog_limit=8192
     Run: update-grub
+    Reboot
   query: |
-    -- Check for audit_backlog_limit parameter set to 8192 or higher
-    -- Using kernel_info.arguments which contains boot parameters
+    -- Check for audit_backlog_limit parameter set to a value greater than 64
+    -- More efficient pattern matching approach
     SELECT 1 WHERE EXISTS (
       SELECT * FROM kernel_info 
       WHERE arguments LIKE '%audit_backlog_limit=%'
       AND (
-        -- Exact CIS recommended value
-        arguments LIKE '%audit_backlog_limit=8192%' OR
-        -- Common larger values that meet the requirement  
-        arguments LIKE '%audit_backlog_limit=16384%' OR
-        arguments LIKE '%audit_backlog_limit=32768%' OR
-        arguments LIKE '%audit_backlog_limit=65536%' OR
-        arguments LIKE '%audit_backlog_limit=131072%' OR
-        arguments LIKE '%audit_backlog_limit=262144%' OR
-        -- Values in 819x range (8193-8199)
-        arguments LIKE '%audit_backlog_limit=8193%' OR
-        arguments LIKE '%audit_backlog_limit=8194%' OR
-        arguments LIKE '%audit_backlog_limit=8195%' OR
-        arguments LIKE '%audit_backlog_limit=8196%' OR
-        arguments LIKE '%audit_backlog_limit=8197%' OR
-        arguments LIKE '%audit_backlog_limit=8198%' OR
-        arguments LIKE '%audit_backlog_limit=8199%' OR
-        -- Values starting with 82, 83, 84, etc. (all >= 8200)
-        arguments LIKE '%audit_backlog_limit=82%' OR
-        arguments LIKE '%audit_backlog_limit=83%' OR
-        arguments LIKE '%audit_backlog_limit=84%' OR
-        arguments LIKE '%audit_backlog_limit=85%' OR
-        arguments LIKE '%audit_backlog_limit=86%' OR
-        arguments LIKE '%audit_backlog_limit=87%' OR
-        arguments LIKE '%audit_backlog_limit=88%' OR
-        arguments LIKE '%audit_backlog_limit=89%' OR
-        arguments LIKE '%audit_backlog_limit=9%'
+        -- Three or more digits (100+)
+        arguments LIKE '%audit_backlog_limit=___% %' OR
+        arguments LIKE '%audit_backlog_limit=____%' OR
+        -- Two digits starting with 7, 8, or 9 (70-99)
+        arguments LIKE '%audit_backlog_limit=7_ %' OR arguments LIKE '%audit_backlog_limit=7_' OR
+        arguments LIKE '%audit_backlog_limit=8_ %' OR arguments LIKE '%audit_backlog_limit=8_' OR
+        arguments LIKE '%audit_backlog_limit=9_ %' OR arguments LIKE '%audit_backlog_limit=9_' OR
+        -- Specific values 65-69
+        arguments LIKE '%audit_backlog_limit=65 %' OR arguments LIKE '%audit_backlog_limit=65' OR
+        arguments LIKE '%audit_backlog_limit=66 %' OR arguments LIKE '%audit_backlog_limit=66' OR
+        arguments LIKE '%audit_backlog_limit=67 %' OR arguments LIKE '%audit_backlog_limit=67' OR
+        arguments LIKE '%audit_backlog_limit=68 %' OR arguments LIKE '%audit_backlog_limit=68' OR
+        arguments LIKE '%audit_backlog_limit=69 %' OR arguments LIKE '%audit_backlog_limit=69'
       )
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.1.1.4
   contributors: allenhouchins
+
 ---
 apiVersion: v1
 kind: policy
