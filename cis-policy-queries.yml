@@ -1978,11 +1978,11 @@ spec:
   resolution: |
     Edit the /etc/systemd/journald.conf file and ensure ForwardToSyslog is set to no
   query: |
-    SELECT 1 WHERE NOT EXISTS (
-      SELECT * FROM augeas 
-      WHERE path = '/etc/systemd/journald.conf/Journal/ForwardToSyslog'
-      AND label = 'ForwardToSyslog'
-      AND value != 'no'
+    SELECT 1 WHERE EXISTS (
+      SELECT 1 FROM file_lines 
+      WHERE path = '/etc/systemd/journald.conf'
+      AND line LIKE 'ForwardToSyslog=no'
+      AND line NOT LIKE '#%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-4.3.1.3
