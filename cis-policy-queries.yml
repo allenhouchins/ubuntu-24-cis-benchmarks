@@ -1,18 +1,14 @@
 # =============================================================================
-# CIS UBUNTU 24.04 LTS COMPLIANCE QUERIES FOR FLEET - COMPLETE MASTER FILE
+# CIS UBUNTU 24.04 LTS COMPLIANCE QUERIES FOR FLEET - COMPLETE
 # =============================================================================
 #
-# This master file contains ALL osquery-based compliance queries for the
+# This file contains ALL osquery-based compliance queries for the
 # CIS Ubuntu Linux 24.04 LTS Benchmark v1.0.0
 #
 # IMPORTANT: These queries are designed to work with Fleet's supported osquery
 # tables and return 1 for compliant devices, 0 for non-compliant.
 #
-# TOTAL POLICIES: 150+ comprehensive security controls
 # LEVELS: Both Level 1 (basic) and Level 2 (advanced) controls included
-#
-# All queries use only Fleet-supported osquery tables as documented at:
-# https://fleetdm.com/tables and https://www.osquery.io/schema/
 #
 # =============================================================================
 # SECTION 1: INITIAL SETUP - FILESYSTEM CONFIGURATION
