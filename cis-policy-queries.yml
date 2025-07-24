@@ -2433,15 +2433,26 @@ spec:
   description: |
     Monitor changes to file permissions, attributes, ownership and group.
   resolution: |
-    Add the following lines to /etc/audit/rules.d/50-perm_mod.rules:
+    Add the following lines to /etc/audit/rules.d/audit.rules:
     -a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=unset -F key=perm_mod
     -a always,exit -F arch=b64 -S chown,fchown,lchown,fchownat -F auid>=1000 -F auid!=unset -F key=perm_mod
     -a always,exit -F arch=b64 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid>=1000 -F auid!=unset -F key=perm_mod
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path LIKE '/etc/audit/rules.d/%' 
-      AND filename LIKE '%.rules'
+    SELECT 1
+    WHERE EXISTS (
+      SELECT 1 FROM file_lines 
+      WHERE path = '/etc/audit/rules.d/audit.rules'
+        AND line = '-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=unset -F key=perm_mod'
+    )
+    AND EXISTS (
+      SELECT 1 FROM file_lines 
+      WHERE path = '/etc/audit/rules.d/audit.rules'
+        AND line = '-a always,exit -F arch=b64 -S chown,fchown,lchown,fchownat -F auid>=1000 -F auid!=unset -F key=perm_mod'
+    )
+    AND EXISTS (
+      SELECT 1 FROM file_lines 
+      WHERE path = '/etc/audit/rules.d/audit.rules'
+        AND line = '-a always,exit -F arch=b64 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid>=1000 -F auid!=unset -F key=perm_mod'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.3.10
