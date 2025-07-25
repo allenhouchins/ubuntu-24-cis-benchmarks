@@ -2921,17 +2921,36 @@ spec:
     Edit the /etc/ssh/sshd_config file to set the parameter:
     Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM augeas 
-      WHERE path = '/etc/ssh/sshd_config'
-      AND label = 'Ciphers'
-      AND value = 'chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr'
+    SELECT 1 WHERE (
+      (SELECT COUNT(DISTINCT value) FROM augeas 
+       WHERE node LIKE '/files/etc/ssh/sshd_config/Ciphers/%' 
+       AND value IN (
+         'chacha20-poly1305@openssh.com',
+         'aes256-gcm@openssh.com',
+         'aes128-gcm@openssh.com',
+         'aes256-ctr',
+         'aes192-ctr',
+         'aes128-ctr'
+       )) = 6
+      AND NOT EXISTS (
+        SELECT 1 FROM augeas 
+        WHERE node LIKE '/files/etc/ssh/sshd_config/Ciphers/%'
+        AND value NOT IN (
+          'chacha20-poly1305@openssh.com',
+          'aes256-gcm@openssh.com',
+          'aes128-gcm@openssh.com',
+          'aes256-ctr',
+          'aes192-ctr',
+          'aes128-ctr'
+        )
+      )
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM listening_ports 
+      WHERE port = 22 AND protocol = 6
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.13
-  contributors: allenhouchins
+  contributors: allenhouchins, moojomoore
 
 ---
 apiVersion: v1
@@ -2946,13 +2965,38 @@ spec:
     Edit the /etc/ssh/sshd_config file to set the parameter:
     KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM augeas 
-      WHERE path = '/etc/ssh/sshd_config'
-      AND label = 'KexAlgorithms'
-      AND value = 'curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256'
+    SELECT 1 WHERE (
+      (SELECT COUNT(DISTINCT value) FROM augeas 
+       WHERE node LIKE '/files/etc/ssh/sshd_config/KexAlgorithms/%' 
+       AND value IN (
+         'curve25519-sha256',
+         'curve25519-sha256@libssh.org',
+         'diffie-hellman-group14-sha256',
+         'diffie-hellman-group16-sha512',
+         'diffie-hellman-group18-sha512',
+         'ecdh-sha2-nistp521',
+         'ecdh-sha2-nistp384',
+         'ecdh-sha2-nistp256',
+         'diffie-hellman-group-exchange-sha256'
+       )) = 9
+      AND NOT EXISTS (
+        SELECT 1 FROM augeas 
+        WHERE node LIKE '/files/etc/ssh/sshd_config/KexAlgorithms/%'
+        AND value NOT IN (
+          'curve25519-sha256',
+          'curve25519-sha256@libssh.org',
+          'diffie-hellman-group14-sha256',
+          'diffie-hellman-group16-sha512',
+          'diffie-hellman-group18-sha512',
+          'ecdh-sha2-nistp521',
+          'ecdh-sha2-nistp384',
+          'ecdh-sha2-nistp256',
+          'diffie-hellman-group-exchange-sha256'
+        )
+      )
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM listening_ports 
+      WHERE port = 22 AND protocol = 6
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.14
@@ -2971,13 +3015,28 @@ spec:
     Edit the /etc/ssh/sshd_config file to set the parameter:
     MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM augeas 
-      WHERE path = '/etc/ssh/sshd_config'
-      AND label = 'MACs'
-      AND value = 'hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
+    SELECT 1 WHERE (
+      (SELECT COUNT(DISTINCT value) FROM augeas 
+       WHERE node LIKE '/files/etc/ssh/sshd_config/MACs/%' 
+       AND value IN (
+         'hmac-sha2-512-etm@openssh.com',
+         'hmac-sha2-256-etm@openssh.com',
+         'hmac-sha2-512',
+         'hmac-sha2-256'
+       )) = 4
+      AND NOT EXISTS (
+        SELECT 1 FROM augeas 
+        WHERE node LIKE '/files/etc/ssh/sshd_config/MACs/%'
+        AND value NOT IN (
+          'hmac-sha2-512-etm@openssh.com',
+          'hmac-sha2-256-etm@openssh.com',
+          'hmac-sha2-512',
+          'hmac-sha2-256'
+        )
+      )
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM listening_ports 
+      WHERE port = 22 AND protocol = 6
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.15
