@@ -3276,6 +3276,7 @@ spec:
 
 ---
 apiVersion: v1
+apiVersion: v1
 kind: policy
 spec:
   name: CIS - password hashing algorithm is sha512
@@ -3285,11 +3286,15 @@ spec:
     The sha512 algorithm provides stronger hashing than md5 or sha256.
   resolution: |
     Edit /etc/pam.d/common-password and ensure the pam_unix.so line includes sha512:
-    password [success=1 default=ignore] pam_unix.so sha512
+    password [success=1 default=ignore] pam_unix.so obscure use_authtok try_first_pass sha512
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path = '/etc/pam.d/common-password'
+    SELECT 1 WHERE NOT EXISTS (
+      SELECT 1 FROM shadow 
+      WHERE hash_alg NOT IN ('sha512', 'yescrypt', '') 
+      AND username IN (
+        SELECT username FROM users 
+        WHERE uid >= 1000 OR username = 'root'
+      )
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.4.4
