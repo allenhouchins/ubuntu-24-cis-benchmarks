@@ -1870,13 +1870,29 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    rsyslog will create logfiles that may contain sensitive information.
+    rsyslog creates logfiles that may contain sensitive information, so the default
+    create mode must be 0640 or stricter. This policy passes when an uncommented
+    $FileCreateMode directive of 0640 (or stricter: 0600/0440/0400) is present in
+    /etc/rsyslog.conf or any /etc/rsyslog.d/*.conf file.
   resolution: |
-    Edit /etc/rsyslog.conf and /etc/rsyslog.d/*.conf files and set:
+    Add the following line to /etc/rsyslog.conf or a file in /etc/rsyslog.d/:
     $FileCreateMode 0640
+    Then restart rsyslog:
+    # systemctl restart rsyslog
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file WHERE path = '/etc/rsyslog.conf'
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path = '/etc/rsyslog.conf'
+      AND (line LIKE '$FileCreateMode 0640%' OR line LIKE '$FileCreateMode 0600%'
+           OR line LIKE '$FileCreateMode 0440%' OR line LIKE '$FileCreateMode 0400%')
+      AND line NOT LIKE '#%'
+    ) OR EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/rsyslog.d/%.conf'
+      AND (line LIKE '$FileCreateMode 0640%' OR line LIKE '$FileCreateMode 0600%'
+           OR line LIKE '$FileCreateMode 0440%' OR line LIKE '$FileCreateMode 0400%')
+      AND line NOT LIKE '#%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-4.1.1.3
@@ -1890,12 +1906,39 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    The /etc/rsyslog.conf and /etc/rsyslog.d/*.conf files specify rules for logging and which files are to be used to log certain classes of messages.
+    rsyslog must be configured with at least one active facility.priority rule that
+    routes log messages to a destination. This policy passes when an uncommented rule
+    matching a typical syslog facility (auth, authpriv, kern, mail, cron, daemon, user
+    or wildcard *.*) is present in /etc/rsyslog.conf or any /etc/rsyslog.d/*.conf file.
   resolution: |
-    Edit /etc/rsyslog.conf and /etc/rsyslog.d/*.conf files and configure logging as appropriate for your environment.
+    Edit /etc/rsyslog.conf or add a file to /etc/rsyslog.d/ that defines logging rules
+    appropriate for your environment, for example:
+    auth,authpriv.*                 /var/log/auth.log
+    *.*;auth,authpriv.none          -/var/log/syslog
+    kern.*                          -/var/log/kern.log
+    mail.*                          -/var/log/mail.log
+    Then restart rsyslog:
+    # systemctl restart rsyslog
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file WHERE path = '/etc/rsyslog.conf' AND size > 0
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path = '/etc/rsyslog.conf'
+      AND (
+        line LIKE 'auth%.%' OR line LIKE 'authpriv%.%'
+        OR line LIKE 'kern.%' OR line LIKE 'mail.%' OR line LIKE 'cron.%'
+        OR line LIKE 'daemon.%' OR line LIKE 'user.%' OR line LIKE '*.*%'
+      )
+      AND line NOT LIKE '#%'
+    ) OR EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/rsyslog.d/%.conf'
+      AND (
+        line LIKE 'auth%.%' OR line LIKE 'authpriv%.%'
+        OR line LIKE 'kern.%' OR line LIKE 'mail.%' OR line LIKE 'cron.%'
+        OR line LIKE 'daemon.%' OR line LIKE 'user.%' OR line LIKE '*.*%'
+      )
+      AND line NOT LIKE '#%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-4.1.1.4
@@ -1909,13 +1952,27 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    The rsyslog utility supports the ability to send logs it gathers to a remote log host.
+    rsyslog should forward logs to a remote log aggregation host. This policy passes when
+    an uncommented forwarding rule (e.g. `*.* @@loghost` for TCP or `*.* @loghost` for UDP)
+    is present in /etc/rsyslog.conf or any /etc/rsyslog.d/*.conf file. Hosts that are
+    themselves the central log server should be exempted from this control.
   resolution: |
-    Edit /etc/rsyslog.conf and /etc/rsyslog.d/*.conf files and add:
-    *.* @@<remote_log_server>
+    Add a forwarding directive to /etc/rsyslog.conf or a file in /etc/rsyslog.d/, e.g.:
+    *.* @@loghost.example.com:514
+    Then restart rsyslog:
+    # systemctl restart rsyslog
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file WHERE path = '/etc/rsyslog.conf'
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path = '/etc/rsyslog.conf'
+      AND (line LIKE '*.* @@%' OR line LIKE '*.* @%')
+      AND line NOT LIKE '#%'
+    ) OR EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/rsyslog.d/%.conf'
+      AND (line LIKE '*.* @@%' OR line LIKE '*.* @%')
+      AND line NOT LIKE '#%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-4.1.1.5
@@ -1994,19 +2051,25 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Journald should be configured to store logs persistently.
+    Journald should be configured to write logs persistently to disk so they survive
+    reboots. This requires Storage=persistent in /etc/systemd/journald.conf.
   resolution: |
-    Edit the /etc/systemd/journald.conf file and set the following parameter:
-    # SystemMaxUse=
-    # SystemKeepFree=
-    # SystemMaxFileSize=
-    # RuntimeMaxUse=
-    # RuntimeKeepFree=
-    # RuntimeMaxFileSize=
+    Edit /etc/systemd/journald.conf (or drop a file in /etc/systemd/journald.conf.d/)
+    and set:
+    Storage=persistent
+    Then reload journald:
+    # systemctl restart systemd-journald
   query: |
-    SELECT 1 WHERE NOT EXISTS (
-      SELECT * FROM listening_ports 
-      WHERE port = 19532 AND protocol = 6
+    SELECT 1 WHERE EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path = '/etc/systemd/journald.conf'
+      AND line LIKE 'Storage=persistent%'
+      AND line NOT LIKE '#%'
+    ) OR EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/systemd/journald.conf.d/%.conf'
+      AND line LIKE 'Storage=persistent%'
+      AND line NOT LIKE '#%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-4.3.1.4
@@ -2208,18 +2271,27 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    System log files stored in /var/log/ should have appropriate permissions and ownership.
+    System log files stored under /var/log/ should be owned by root and have group-write,
+    group-execute, and all 'other' permission bits cleared (mode 0640 or stricter for files,
+    0750 or stricter for directories). This check recursively inspects every regular file
+    under /var/log/ and fails the host if any file is owned by a non-root user, has any
+    'other' permission bit set, or has group-write/group-execute set.
   resolution: |
-    Run the following command to set permissions on all existing log files:
-    # find /var/log -type f -exec chmod g-wx,o-rwx "{}" + -o -type d -exec chmod g-w,o-rwx "{}" +
+    Run the following commands as root to remediate permissions and ownership under /var/log/:
+    # find /var/log -type f -exec chmod g-wx,o-rwx {} +
+    # find /var/log -type d -exec chmod g-w,o-rwx {} +
+    # find /var/log -type f ! -group adm ! -group syslog -exec chown root:root {} +
+    Some distributions ship specific files (e.g. /var/log/lastlog, /var/log/wtmp) with
+    different group ownership; review and adjust per the CIS guidance for your environment.
   query: |
     SELECT 1 WHERE NOT EXISTS (
-      SELECT * FROM file 
-      WHERE path LIKE '/var/log/%' 
-      AND type = 'regular' 
+      SELECT 1 FROM file
+      WHERE path LIKE '/var/log/%%'
+      AND type = 'regular'
       AND (
-        mode NOT LIKE '0640' 
-        AND mode NOT LIKE '0600'
+        uid != 0
+        OR SUBSTR(mode, 3, 1) NOT IN ('0', '4')
+        OR SUBSTR(mode, 4, 1) != '0'
       )
     );
   purpose: Informational
@@ -2238,15 +2310,20 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Monitor usage of AppArmor mandatory access controls.
+    A watch rule on /usr/sbin/apparmor_parser must be configured so that any execution of
+    the AppArmor profile parser is recorded by auditd. This policy passes when a rule of
+    the form -w /usr/sbin/apparmor_parser -p x -k <key> is present in a rules.d file.
   resolution: |
-    Add the following line to /etc/audit/rules.d/50-MAC-policy.rules:
+    Create or edit /etc/audit/rules.d/50-MAC-policy.rules and ensure it contains:
     -w /usr/sbin/apparmor_parser -p x -k MAC-policy
+    Then reload the rules and verify:
+    # augenrules --load
+    # auditctl -l | grep apparmor_parser
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path LIKE '/etc/audit/rules.d/%' 
-      AND filename LIKE '%.rules'
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-w /usr/sbin/apparmor_parser %-p x%-k %'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.2.1
@@ -2260,16 +2337,28 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Monitor scope changes for system administrators.
+    Audit rules must collect every write or attribute change to /etc/sudoers and the
+    /etc/sudoers.d directory. This policy passes only when both watch rules
+    (-w /etc/sudoers -p wa -k scope and -w /etc/sudoers.d -p wa -k scope) are present in
+    a rules.d file or the compiled audit.rules file.
   resolution: |
-    Add the following lines to /etc/audit/rules.d/audit.rules:
+    Create or edit /etc/audit/rules.d/50-scope.rules and ensure it contains:
     -w /etc/sudoers -p wa -k scope
     -w /etc/sudoers.d -p wa -k scope
+    Then reload the audit rules and verify with auditctl:
+    # augenrules --load
+    # auditctl -l | grep scope
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path LIKE '/etc/audit/rules.d/%' 
-      AND filename LIKE '%.rules'
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-w /etc/sudoers %-p wa%-k %'
+    )
+    AND EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-w /etc/sudoers.d %-p wa%-k %'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.3.1
@@ -2283,15 +2372,24 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Monitor the sudo log file. If the system has been properly configured to force sudo log files, the file /var/log/sudo.log is defined.
+    Audit rules must collect every write or attribute change to /var/log/sudo.log so that
+    sudo activity is recorded. This policy passes only when a watch rule of the form
+    -w /var/log/sudo.log -p wa -k <key> is present in a rules.d file or the compiled
+    audit.rules file. This control assumes sudo has been configured to write to
+    /var/log/sudo.log via the sudoers logfile= option.
   resolution: |
-    Add the following lines to /etc/audit/rules.d/50-actions.rules:
+    Create or edit /etc/audit/rules.d/50-actions.rules and ensure it contains:
     -w /var/log/sudo.log -p wa -k actions
+    Then reload audit rules and verify:
+    # augenrules --load
+    # auditctl -l | grep sudo.log
+    If sudo is not yet configured to write a logfile, add the following to /etc/sudoers
+    (via visudo): Defaults logfile="/var/log/sudo.log"
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path LIKE '/etc/audit/rules.d/%' 
-      AND filename LIKE '%.rules'
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-w /var/log/sudo.log %-p wa%-k %'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.3.2
@@ -2305,17 +2403,29 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Capture events where the system date and/or time has been modified.
+    Audit rules must capture every system call or filesystem change related to time. This
+    policy passes when there are rules using the time-change key for time-related syscalls
+    (adjtimex/settimeofday/clock_settime) AND for the /etc/localtime watch.
   resolution: |
-    Add the following lines to /etc/audit/rules.d/50-time-change.rules:
+    Create or edit /etc/audit/rules.d/50-time-change.rules and ensure it contains:
     -a always,exit -F arch=b64 -S adjtimex,settimeofday,clock_settime -k time-change
     -a always,exit -F arch=b32 -S adjtimex,settimeofday,clock_settime -k time-change
     -w /etc/localtime -p wa -k time-change
+    Then reload audit rules and verify:
+    # augenrules --load
+    # auditctl -l | grep time-change
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path LIKE '/etc/audit/rules.d/%' 
-      AND filename LIKE '%.rules'
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '%adjtimex%'
+      AND line LIKE '%-k time-change%'
+    )
+    AND EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-w /etc/localtime %-p wa%-k time-change%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.3.3
@@ -2329,9 +2439,11 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Record changes to network environment files or system calls.
+    Audit rules must record changes to network environment files and the hostname/domain
+    syscalls. This policy passes when rules using the system-locale key are present for
+    both the syscall set (sethostname/setdomainname) and the /etc/hosts watch.
   resolution: |
-    Add the following lines to /etc/audit/rules.d/50-system_locale.rules:
+    Create or edit /etc/audit/rules.d/50-system_locale.rules and ensure it contains:
     -a always,exit -F arch=b64 -S sethostname,setdomainname -k system-locale
     -a always,exit -F arch=b32 -S sethostname,setdomainname -k system-locale
     -w /etc/issue -p wa -k system-locale
@@ -2340,11 +2452,19 @@ spec:
     -w /etc/networks -p wa -k system-locale
     -w /etc/network/ -p wa -k system-locale
     -w /etc/netplan/ -p wa -k system-locale
+    Then run: augenrules --load
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path LIKE '/etc/audit/rules.d/%' 
-      AND filename LIKE '%.rules'
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '%sethostname%'
+      AND line LIKE '%-k system-locale%'
+    )
+    AND EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-w /etc/hosts %-p wa%-k system-locale%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.3.6
@@ -2358,15 +2478,22 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Monitor privileged programs, those that have the setuid and/or setgid bit set on execution.
+    Audit rules must monitor execution of every setuid/setgid binary on the system using
+    the "privileged" key. The set of rules is host-specific because it depends on which
+    binaries have those bits set. This policy passes when at least one rule using the
+    privileged key is present in a rules.d file.
   resolution: |
-    Find all setuid/setgid programs and create audit rules for them:
-    # find / -xdev \( -perm -4000 -o -perm -2000 \) -type f | awk '{print "-a always,exit -F path=" $1 " -F perm=x -F auid>=1000 -F auid!=unset -k privileged" }' >> /etc/audit/rules.d/50-privileged.rules
+    Generate per-host rules and append them to /etc/audit/rules.d/50-privileged.rules:
+    # find / -xdev \( -perm -4000 -o -perm -2000 \) -type f | \
+        awk '{print "-a always,exit -F path=" $1 " -F perm=x -F auid>=1000 -F auid!=unset -k privileged" }' \
+        >> /etc/audit/rules.d/50-privileged.rules
+    Then reload audit rules:
+    # augenrules --load
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path LIKE '/etc/audit/rules.d/%' 
-      AND filename LIKE '%.rules'
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-a always,exit%-F path=%-F perm=x%-k privileged%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.3.7
@@ -2380,18 +2507,29 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Monitor for unsuccessful attempts to access files.
+    Audit rules must record unsuccessful file access attempts (-EACCES and -EPERM exits)
+    using the "access" key. This policy passes when rules for both -EACCES and -EPERM
+    exits exist under the access key.
   resolution: |
-    Add the following lines to /etc/audit/rules.d/50-access.rules:
+    Create or edit /etc/audit/rules.d/50-access.rules and ensure it contains:
     -a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=unset -k access
     -a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=unset -k access
     -a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=unset -k access
     -a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=unset -k access
+    Then run: augenrules --load
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path LIKE '/etc/audit/rules.d/%' 
-      AND filename LIKE '%.rules'
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '%-F exit=-EACCES%'
+      AND line LIKE '%-k access%'
+    )
+    AND EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '%-F exit=-EPERM%'
+      AND line LIKE '%-k access%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.3.8
@@ -2405,19 +2543,38 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Record events affecting the modification of user or group information including passwords.
+    Audit rules must watch the canonical user/group identity files for write or attribute
+    changes using the "identity" key. This policy passes when all four watches (/etc/group,
+    /etc/passwd, /etc/gshadow, /etc/shadow) are present in rules.d files.
   resolution: |
-    Add the following lines to /etc/audit/rules.d/50-identity.rules:
+    Create or edit /etc/audit/rules.d/50-identity.rules and ensure it contains:
     -w /etc/group -p wa -k identity
     -w /etc/passwd -p wa -k identity
     -w /etc/gshadow -p wa -k identity
     -w /etc/shadow -p wa -k identity
     -w /etc/security/opasswd -p wa -k identity
+    Then run: augenrules --load
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path LIKE '/etc/audit/rules.d/%' 
-      AND filename LIKE '%.rules'
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-w /etc/group %-p wa%-k identity%'
+    )
+    AND EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-w /etc/passwd %-p wa%-k identity%'
+    )
+    AND EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-w /etc/gshadow %-p wa%-k identity%'
+    )
+    AND EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-w /etc/shadow %-p wa%-k identity%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.3.9
@@ -2431,28 +2588,35 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Monitor changes to file permissions, attributes, ownership and group.
+    Audit rules must capture chmod/chown/setxattr-family syscalls so changes to file
+    permissions, ownership, and extended attributes are recorded. This policy passes when
+    rules referencing chmod, chown, and setxattr exist under the perm_mod key in any rules.d
+    file (either `-k perm_mod` or `-F key=perm_mod` syntax is accepted).
   resolution: |
-    Add the following lines to /etc/audit/rules.d/audit.rules:
-    -a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=unset -F key=perm_mod
-    -a always,exit -F arch=b64 -S chown,fchown,lchown,fchownat -F auid>=1000 -F auid!=unset -F key=perm_mod
-    -a always,exit -F arch=b64 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid>=1000 -F auid!=unset -F key=perm_mod
+    Create or edit /etc/audit/rules.d/50-perm_mod.rules and ensure it contains:
+    -a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=unset -k perm_mod
+    -a always,exit -F arch=b64 -S chown,fchown,lchown,fchownat -F auid>=1000 -F auid!=unset -k perm_mod
+    -a always,exit -F arch=b64 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid>=1000 -F auid!=unset -k perm_mod
+    Add the matching -F arch=b32 lines as well, then run: augenrules --load
   query: |
-    SELECT 1
-    WHERE EXISTS (
-      SELECT 1 FROM file_lines 
-      WHERE path = '/etc/audit/rules.d/audit.rules'
-        AND line = '-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=unset -F key=perm_mod'
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '%-S chmod%'
+      AND (line LIKE '%-k perm_mod%' OR line LIKE '%key=perm_mod%')
     )
     AND EXISTS (
-      SELECT 1 FROM file_lines 
-      WHERE path = '/etc/audit/rules.d/audit.rules'
-        AND line = '-a always,exit -F arch=b64 -S chown,fchown,lchown,fchownat -F auid>=1000 -F auid!=unset -F key=perm_mod'
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '%-S chown%'
+      AND (line LIKE '%-k perm_mod%' OR line LIKE '%key=perm_mod%')
     )
     AND EXISTS (
-      SELECT 1 FROM file_lines 
-      WHERE path = '/etc/audit/rules.d/audit.rules'
-        AND line = '-a always,exit -F arch=b64 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid>=1000 -F auid!=unset -F key=perm_mod'
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '%-S setxattr%'
+      AND (line LIKE '%-k perm_mod%' OR line LIKE '%key=perm_mod%')
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.3.10
@@ -2466,16 +2630,20 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Monitor the use of the mount system call.
+    Audit rules must record every use of the mount syscall using the "mounts" key. This
+    policy passes when a rule combining -S mount with -k mounts is present in a rules.d
+    file.
   resolution: |
-    Add the following lines to /etc/audit/rules.d/50-mounts.rules:
+    Create or edit /etc/audit/rules.d/50-mounts.rules and ensure it contains:
     -a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=unset -k mounts
     -a always,exit -F arch=b32 -S mount -F auid>=1000 -F auid!=unset -k mounts
+    Then run: augenrules --load
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path LIKE '/etc/audit/rules.d/%' 
-      AND filename LIKE '%.rules'
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '%-S mount%'
+      AND line LIKE '%-k mounts%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.3.12
@@ -2489,17 +2657,31 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Monitor session initiation events including login and logout.
+    Audit rules must watch the three login/session record files so login and logout events
+    are captured. This policy passes when watches on /var/run/utmp (key=session) and
+    /var/log/wtmp and /var/log/btmp (key=logins) are all present in rules.d files.
   resolution: |
-    Add the following lines to /etc/audit/rules.d/50-session.rules:
+    Create or edit /etc/audit/rules.d/50-session.rules and ensure it contains:
     -w /var/run/utmp -p wa -k session
     -w /var/log/wtmp -p wa -k logins
     -w /var/log/btmp -p wa -k logins
+    Then run: augenrules --load
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path LIKE '/etc/audit/rules.d/%' 
-      AND filename LIKE '%.rules'
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-w /var/run/utmp %-p wa%-k session%'
+    )
+    AND EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-w /var/log/wtmp %-p wa%-k logins%'
+    )
+    AND EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '-w /var/log/btmp %-p wa%-k logins%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.3.13
@@ -2513,16 +2695,27 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Monitor the loading and unloading of kernel modules.
+    Audit rules must record kernel module operations via the init_module/finit_module/
+    delete_module syscalls AND execution of /usr/bin/kmod, all under the "kernel_modules"
+    key. This policy passes when both rule patterns exist in rules.d files.
   resolution: |
-    Add the following lines to /etc/audit/rules.d/50-kernel_modules.rules:
+    Create or edit /etc/audit/rules.d/50-kernel_modules.rules and ensure it contains:
     -a always,exit -F arch=b64 -S init_module,finit_module,delete_module,create_module,query_module -F auid>=1000 -F auid!=unset -k kernel_modules
     -a always,exit -F path=/usr/bin/kmod -F perm=x -F auid>=1000 -F auid!=unset -k kernel_modules
+    Then run: augenrules --load
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path LIKE '/etc/audit/rules.d/%' 
-      AND filename LIKE '%.rules'
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND (line LIKE '%init_module%' OR line LIKE '%delete_module%')
+      AND line LIKE '%-k kernel_modules%'
+    )
+    AND EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND line LIKE '%-F path=/usr/bin/kmod%'
+      AND line LIKE '%-k kernel_modules%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.3.14
@@ -2536,14 +2729,20 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Set system audit so that audit rules cannot be modified with auditctl.
+    The audit configuration must be made immutable by adding `-e 2` as the final directive
+    so that audit rules cannot be modified at runtime without rebooting. This policy passes
+    when a line containing `-e 2` is present in any rules.d file (typically 99-finalize.rules).
   resolution: |
-    Add the following line to the END of /etc/audit/rules.d/99-finalize.rules:
+    Ensure /etc/audit/rules.d/99-finalize.rules ends with:
     -e 2
+    Then reload audit rules and reboot for the immutable flag to take effect:
+    # augenrules --load
+    # reboot
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path = '/etc/audit/rules.d/99-finalize.rules'
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/audit/rules.d/%.rules'
+      AND (line = '-e 2' OR line LIKE '-e 2 %' OR line LIKE '-e 2#%')
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-6.2.3.15
@@ -2557,14 +2756,31 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Audit tools include, but are not limited to, vendor-supplied and open source audit tools needed to successfully view and manipulate audit information system activity.
+    The audit tooling (auditctl, aureport, ausearch, autrace, auditd, augenrules) must be
+    owned by root so it cannot be tampered with by unprivileged users. This policy
+    requires auditctl to be present (i.e. the audit package is installed) and passes only
+    when no audit tool under /sbin or /usr/sbin is owned by a non-root user.
   resolution: |
-    Run the following command to change ownership to root:
+    Install the audit package if missing, then run:
     # chown root /sbin/auditctl /sbin/aureport /sbin/ausearch /sbin/autrace /sbin/auditd /sbin/augenrules
+    On systems where /sbin is a symlink to /usr/sbin (Ubuntu 24.04 default) the change
+    applies to /usr/sbin/* as well.
   query: |
-    SELECT 1 WHERE NOT EXISTS (
-      SELECT * FROM file 
-      WHERE path IN ('/sbin/auditctl', '/sbin/aureport', '/sbin/ausearch', '/sbin/autrace', '/sbin/auditd', '/sbin/augenrules')
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file
+      WHERE path IN ('/sbin/auditctl', '/usr/sbin/auditctl')
+      AND type = 'regular'
+    )
+    AND NOT EXISTS (
+      SELECT 1 FROM file
+      WHERE path IN (
+        '/sbin/auditctl', '/sbin/aureport', '/sbin/ausearch', '/sbin/autrace',
+        '/sbin/auditd', '/sbin/augenrules',
+        '/usr/sbin/auditctl', '/usr/sbin/aureport', '/usr/sbin/ausearch',
+        '/usr/sbin/autrace', '/usr/sbin/auditd', '/usr/sbin/augenrules'
+      )
+      AND type = 'regular'
       AND uid != 0
     );
   purpose: Informational
@@ -2579,14 +2795,29 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Protecting audit tools from unauthorized access and use is necessary to prevent unauthorized modification.
+    The audit tooling must belong to group root so it cannot be tampered with by members
+    of other groups. This policy requires auditctl to be present (i.e. the audit package
+    is installed) and passes only when no audit tool under /sbin or /usr/sbin has a
+    non-root group owner.
   resolution: |
-    Run the following command to change group ownership to the group root:
+    Install the audit package if missing, then run:
     # chgrp root /sbin/auditctl /sbin/aureport /sbin/ausearch /sbin/autrace /sbin/auditd /sbin/augenrules
   query: |
-    SELECT 1 WHERE NOT EXISTS (
-      SELECT * FROM file 
-      WHERE path IN ('/sbin/auditctl', '/sbin/aureport', '/sbin/ausearch', '/sbin/autrace', '/sbin/auditd', '/sbin/augenrules')
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file
+      WHERE path IN ('/sbin/auditctl', '/usr/sbin/auditctl')
+      AND type = 'regular'
+    )
+    AND NOT EXISTS (
+      SELECT 1 FROM file
+      WHERE path IN (
+        '/sbin/auditctl', '/sbin/aureport', '/sbin/ausearch', '/sbin/autrace',
+        '/sbin/auditd', '/sbin/augenrules',
+        '/usr/sbin/auditctl', '/usr/sbin/aureport', '/usr/sbin/ausearch',
+        '/usr/sbin/autrace', '/usr/sbin/auditd', '/usr/sbin/augenrules'
+      )
+      AND type = 'regular'
       AND gid != 0
     );
   purpose: Informational
@@ -2697,7 +2928,7 @@ spec:
       OR path LIKE '/etc/ssh/sshd_config'
       AND label = 'DenyGroups'
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.4
@@ -2724,7 +2955,7 @@ spec:
       AND label = 'LogLevel'
       AND (value = 'VERBOSE' OR value = 'INFO')
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.5
@@ -2749,7 +2980,7 @@ spec:
       AND label = 'UsePAM'
       AND value = 'yes'
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.6
@@ -2774,7 +3005,7 @@ spec:
       AND label = 'PermitRootLogin'
       AND value = 'no'
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.7
@@ -2799,7 +3030,7 @@ spec:
       AND label = 'HostbasedAuthentication'
       AND value = 'no'
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.8
@@ -2824,7 +3055,7 @@ spec:
       AND label = 'PermitEmptyPasswords'
       AND value = 'no'
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.9
@@ -2849,8 +3080,7 @@ spec:
       AND label = 'PermitUserEnvironment'
       AND value != 'no'
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports 
-      WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.10
@@ -2875,8 +3105,7 @@ spec:
       AND label = 'IgnoreRhosts'
       AND value != 'yes'
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports 
-      WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.11
@@ -2901,8 +3130,7 @@ spec:
       AND label = 'X11Forwarding'
       AND value != 'no'
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports 
-      WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level2, CIS-ubuntu-24.04-5.1.12
@@ -2945,8 +3173,7 @@ spec:
         )
       )
     ) OR NOT EXISTS (
-      SELECT 1 FROM listening_ports 
-      WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.13
@@ -2995,8 +3222,7 @@ spec:
         )
       )
     ) OR NOT EXISTS (
-      SELECT 1 FROM listening_ports 
-      WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.14
@@ -3035,8 +3261,7 @@ spec:
         )
       )
     ) OR NOT EXISTS (
-      SELECT 1 FROM listening_ports 
-      WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.15
@@ -3061,9 +3286,7 @@ spec:
       AND label = 'Banner' 
       AND value = '/etc/issue.net'
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports 
-      WHERE port = 22 
-      AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.16
@@ -3088,7 +3311,7 @@ spec:
       AND label = 'MaxAuthTries'
       AND CAST(value AS INTEGER) <= 4
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.17
@@ -3112,7 +3335,7 @@ spec:
       WHERE path = '/etc/ssh/sshd_config'
       AND label = 'MaxStartups'
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.18
@@ -3137,7 +3360,7 @@ spec:
       AND label = 'LoginGraceTime'
       AND CAST(value AS INTEGER) <= 60
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.19
@@ -3164,7 +3387,7 @@ spec:
       AND CAST(value AS INTEGER) > 0 
       AND CAST(value AS INTEGER) <= 300
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.21
@@ -3189,8 +3412,7 @@ spec:
       AND label = 'MaxSessions'
       AND CAST(value AS INTEGER) <= 10
     ) OR NOT EXISTS (
-      SELECT * FROM listening_ports 
-      WHERE port = 22 AND protocol = 6
+      SELECT 1 FROM file WHERE path = '/etc/ssh/sshd_config'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.1.24
@@ -3208,18 +3430,48 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    The pam_pwquality.so module checks the strength of passwords.
+    The pam_pwquality module must enforce minimum password complexity. This policy
+    passes only when /etc/security/pwquality.conf sets minlen >= 14 AND each character
+    class credit (dcredit, ucredit, ocredit, lcredit) is configured to require at least
+    one character of that class (value <= -1).
   resolution: |
-    Edit the /etc/security/pwquality.conf file to set password requirements:
+    Edit /etc/security/pwquality.conf and set:
     minlen = 14
     dcredit = -1
     ucredit = -1
     ocredit = -1
     lcredit = -1
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM augeas
       WHERE path = '/etc/security/pwquality.conf'
+      AND label = 'minlen'
+      AND CAST(value AS INTEGER) >= 14
+    )
+    AND EXISTS (
+      SELECT 1 FROM augeas
+      WHERE path = '/etc/security/pwquality.conf'
+      AND label = 'dcredit'
+      AND CAST(value AS INTEGER) <= -1
+    )
+    AND EXISTS (
+      SELECT 1 FROM augeas
+      WHERE path = '/etc/security/pwquality.conf'
+      AND label = 'ucredit'
+      AND CAST(value AS INTEGER) <= -1
+    )
+    AND EXISTS (
+      SELECT 1 FROM augeas
+      WHERE path = '/etc/security/pwquality.conf'
+      AND label = 'ocredit'
+      AND CAST(value AS INTEGER) <= -1
+    )
+    AND EXISTS (
+      SELECT 1 FROM augeas
+      WHERE path = '/etc/security/pwquality.conf'
+      AND label = 'lcredit'
+      AND CAST(value AS INTEGER) <= -1
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.4.1
@@ -3233,21 +3485,38 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Lock out users after n unsuccessful consecutive login attempts.
+    pam_faillock must be enabled in PAM common-auth, and /etc/security/faillock.conf
+    must set deny <= 4 and unlock_time >= 900 so accounts lock after a small number of
+    failed attempts. This policy passes only when pam_faillock is referenced in
+    /etc/pam.d/common-auth AND faillock.conf meets the deny/unlock_time thresholds.
   resolution: |
-    Edit the /etc/pam.d/common-auth file and add:
+    Edit /etc/pam.d/common-auth and ensure these lines exist (uncommented):
     auth required pam_faillock.so preauth
-    auth required pam_faillock.so authfail
+    auth [default=die] pam_faillock.so authfail
+    auth sufficient pam_faillock.so authsucc
     Edit /etc/security/faillock.conf and set:
     deny = 4
     unlock_time = 900
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
       WHERE path = '/etc/pam.d/common-auth'
-    ) AND EXISTS (
-      SELECT * FROM file 
+      AND line LIKE '%pam_faillock.so%'
+      AND line NOT LIKE '#%'
+    )
+    AND EXISTS (
+      SELECT 1 FROM augeas
       WHERE path = '/etc/security/faillock.conf'
+      AND label = 'deny'
+      AND CAST(value AS INTEGER) <= 4
+      AND CAST(value AS INTEGER) > 0
+    )
+    AND EXISTS (
+      SELECT 1 FROM augeas
+      WHERE path = '/etc/security/faillock.conf'
+      AND label = 'unlock_time'
+      AND CAST(value AS INTEGER) >= 900
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.4.2
@@ -3261,14 +3530,19 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    The /etc/security/opasswd file stores the users' old passwords and can be checked to ensure users are not recycling recent passwords.
+    pam_pwhistory must remember at least the last 24 passwords so users cannot recycle
+    recent passwords. This policy passes when /etc/pam.d/common-password contains an
+    uncommented line referencing pam_pwhistory.so with a remember= value of 24 or higher.
   resolution: |
-    Edit the /etc/pam.d/common-password file and add:
-    password required pam_pwhistory.so remember=24 enforce_for_root
+    Edit /etc/pam.d/common-password and add (or update) the following line:
+    password required pam_pwhistory.so remember=24 enforce_for_root use_authtok
   query: |
     SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
+      SELECT 1 FROM file_lines
       WHERE path = '/etc/pam.d/common-password'
+      AND line LIKE '%pam_pwhistory.so%'
+      AND line LIKE '%remember=%'
+      AND line NOT LIKE '#%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.4.3
@@ -3421,17 +3695,30 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    The default umask determines the default permissions for newly created files.
+    The default shell umask must be 027 or more restrictive so newly created files are
+    not world-readable. This policy passes when an uncommented `umask 027` (or stricter:
+    077) directive is present in /etc/bash.bashrc, /etc/profile, or any file in
+    /etc/profile.d/.
   resolution: |
-    Edit /etc/bash.bashrc and /etc/profile to set:
+    Add the following line to /etc/bash.bashrc, /etc/profile, and a file in /etc/profile.d/:
     umask 027
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
       WHERE path = '/etc/bash.bashrc'
-    ) AND EXISTS (
-      SELECT * FROM file 
+      AND (line LIKE '%umask 027%' OR line LIKE '%umask 077%')
+      AND line NOT LIKE '#%'
+    ) OR EXISTS (
+      SELECT 1 FROM file_lines
       WHERE path = '/etc/profile'
+      AND (line LIKE '%umask 027%' OR line LIKE '%umask 077%')
+      AND line NOT LIKE '#%'
+    ) OR EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/profile.d/%.sh'
+      AND (line LIKE '%umask 027%' OR line LIKE '%umask 077%')
+      AND line NOT LIKE '#%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.5.4
@@ -3445,15 +3732,34 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Setting a timeout value reduces the window of opportunity for unauthorized user access to another user's shell session.
+    Shells must idle-timeout via a read-only TMOUT setting of 900 seconds or less. This
+    policy passes when an uncommented `readonly TMOUT=<n>` (or `TMOUT=<n>`) directive
+    with n in 1..900 is present in /etc/bash.bashrc, /etc/profile, or any file in
+    /etc/profile.d/.
   resolution: |
-    Create or edit /etc/profile.d/timeout.sh and add:
-    readonly TMOUT=900
+    Create /etc/profile.d/timeout.sh with the following content:
+    TMOUT=900
+    readonly TMOUT
     export TMOUT
+    Then ensure the file is sourced by login shells (it will be automatically because
+    /etc/profile reads /etc/profile.d/*.sh).
   query: |
-    SELECT 1 WHERE EXISTS (
-      SELECT * FROM file 
-      WHERE path = '/etc/profile.d/timeout.sh'
+    SELECT 1 WHERE
+    EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path LIKE '/etc/profile.d/%.sh'
+      AND (line LIKE '%TMOUT=%' OR line LIKE '%readonly TMOUT%')
+      AND line NOT LIKE '#%'
+    ) OR EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path = '/etc/bash.bashrc'
+      AND line LIKE '%TMOUT=%'
+      AND line NOT LIKE '#%'
+    ) OR EXISTS (
+      SELECT 1 FROM file_lines
+      WHERE path = '/etc/profile'
+      AND line LIKE '%TMOUT=%'
+      AND line NOT LIKE '#%'
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-5.5.5
@@ -3667,36 +3973,57 @@ spec:
   platforms: Linux
   platform: linux
   description: |
-    Unix-based systems support variable settings to control access to files. World writable files are files that any user can write to.
+    No regular file should be world-writable. A file is world-writable when the last
+    octal digit of its mode has the 0002 bit set (digits 2, 3, 6, or 7). This policy
+    recursively scans high-risk directory trees (/etc, /usr/local/{bin,sbin},
+    /var/log, /var/lib, /opt, /root, /home, /usr/share, /var/www) using osquery's
+    file table. Osquery is not well suited to scanning the entire filesystem; for a
+    full check run the `find` command in the resolution.
   resolution: |
-    Remove world write permissions from all files:
-    # find / -xdev -type f -perm -0002 -exec chmod o-w {} \;
+    Find all world-writable files and remove the offending bit:
+    # find / -xdev -type f -perm -0002 -exec ls -l {} +
+    # find / -xdev -type f -perm -0002 -exec chmod o-w {} +
   query: |
     SELECT 1 WHERE NOT EXISTS (
-      SELECT 1 FROM file f
-      WHERE f.mode LIKE '%2' 
-        AND f.type = 'regular'
-        AND f.directory IN (
-          '/etc', '/bin', '/sbin', '/usr/bin', '/usr/sbin', 
-          '/usr/local/bin', '/usr/local/sbin', '/var/log', 
-          '/var/lib', '/var/www', '/opt', '/root'
-        )
+      SELECT 1 FROM file
+      WHERE path LIKE '/etc/%%'
+      AND type = 'regular'
+      AND SUBSTR(mode, 4, 1) IN ('2', '3', '6', '7')
     ) AND NOT EXISTS (
-      SELECT 1 FROM file f
-      WHERE f.mode LIKE '%2' 
-        AND f.type = 'regular'
-        AND f.directory LIKE '/home/%'
+      SELECT 1 FROM file
+      WHERE path LIKE '/usr/local/bin/%%'
+      AND type = 'regular'
+      AND SUBSTR(mode, 4, 1) IN ('2', '3', '6', '7')
     ) AND NOT EXISTS (
-      SELECT 1 FROM file f
-      WHERE f.mode LIKE '%2' 
-        AND f.type = 'regular'
-        AND f.directory LIKE '/usr/share/%'
+      SELECT 1 FROM file
+      WHERE path LIKE '/usr/local/sbin/%%'
+      AND type = 'regular'
+      AND SUBSTR(mode, 4, 1) IN ('2', '3', '6', '7')
     ) AND NOT EXISTS (
-      SELECT 1 FROM file f
-      WHERE f.mode LIKE '%2' 
-        AND f.type = 'regular'
-        AND f.directory LIKE '/var/spool/%'
-        AND f.path NOT LIKE '/var/spool/mail/%'
+      SELECT 1 FROM file
+      WHERE path LIKE '/var/log/%%'
+      AND type = 'regular'
+      AND SUBSTR(mode, 4, 1) IN ('2', '3', '6', '7')
+    ) AND NOT EXISTS (
+      SELECT 1 FROM file
+      WHERE path LIKE '/var/lib/%%'
+      AND type = 'regular'
+      AND SUBSTR(mode, 4, 1) IN ('2', '3', '6', '7')
+    ) AND NOT EXISTS (
+      SELECT 1 FROM file
+      WHERE path LIKE '/opt/%%'
+      AND type = 'regular'
+      AND SUBSTR(mode, 4, 1) IN ('2', '3', '6', '7')
+    ) AND NOT EXISTS (
+      SELECT 1 FROM file
+      WHERE path LIKE '/root/%%'
+      AND type = 'regular'
+      AND SUBSTR(mode, 4, 1) IN ('2', '3', '6', '7')
+    ) AND NOT EXISTS (
+      SELECT 1 FROM file
+      WHERE path LIKE '/home/%%'
+      AND type = 'regular'
+      AND SUBSTR(mode, 4, 1) IN ('2', '3', '6', '7')
     );
   purpose: Informational
   tags: compliance, CIS, CIS_Level1, CIS-ubuntu-24.04-7.1.9
